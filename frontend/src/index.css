@@ -1,1 +1,24 @@
-@import "tailwindcss";
+@import 'tailwindcss';
+
+@theme {
+  /* Animación más natural con curva tipo material */
+  @keyframes slideRight {
+    0% {
+      transform: translateX(-40px);
+      opacity: 0;
+    }
+
+    60% {
+      transform: translateX(6px); /* pequeño overshoot */
+      opacity: 1;
+    }
+
+    100% {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  /* Versión principal */
+  --animate-slide-right: slideRight 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
