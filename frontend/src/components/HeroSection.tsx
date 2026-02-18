@@ -19,12 +19,16 @@ const HeroSection = () => {
     <div className="w-full max-w-6xl mx-auto p-4">
       {/* Imagen del Hero (publicitarias) */}
       <div className="overflow-hidden rounded-2xl shadow-lg">
-        <img src={images[currentIndex]} className="w-full h-auto aspect-[21/9] object-cover" />
+        <img
+          key={currentIndex}
+          src={images[currentIndex]}
+          className="w-full h-auto aspect-21/9 object-cover animate-slide-right"
+        />
       </div>
       {/* Botones para poder cambiar entre imagenes */}
       <div className="pagination-container flex justify-center items-center py-4">
         <div className="pagination-swiper flex gap-2">
-          {images.map((img, index) => {
+          {images.map((_img, index) => {
             const isActive = index == currentIndex
             return (
               <button

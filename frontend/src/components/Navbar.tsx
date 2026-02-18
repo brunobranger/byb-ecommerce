@@ -1,93 +1,43 @@
-import React from 'react'
 import CartIcon from './CartIcon'
 import LoginIcon from './LoginIcon'
 import Subcategories from './Subcategories'
+import { CATEGORY_DATA, type MainCategoryName } from '../types/category'
 
 const Navbar = () => {
-  // Categorías con subcategorías para el dropdown
-  const dropdownCategories = [
-    {
-      name: 'Procesadores',
-      items: ['AMD', 'Intel'],
-    },
-    {
-      name: 'Placas de video',
-      items: ['NVIDIA', 'AMD Radeon', 'Intel'],
-    },
-    {
-      name: 'Memorias RAM',
-      items: ['DDR4', 'DDR5'],
-    },
-    {
-      name: 'Almacenamiento',
-      items: ['SSD M.2 NVMe', 'SSD SATA', 'HDD'],
-    },
-    {
-      name: 'Motherboards',
-      items: [],
-    },
-    {
-      name: 'Fuentes',
-      items: ['500W', '650W', '750W', '850W', '1000W'],
-    },
-    {
-      name: 'Gabinetes',
-      items: ['Mini Tower', 'Mid Tower', 'Full Tower', 'Con RGB', 'Minimalistas'],
-    },
-    {
-      name: 'Refrigeración',
-      items: ['Coolers CPU', 'Refrigeración Líquida', 'Pasta Térmica', 'Ventiladores'],
-    },
-    {
-      name: 'Monitores',
-      items: ['1080p', '2K', '4K'],
-    },
-    {
-      name: 'Periféricos',
-      items: [
-        'Teclados Mecánicos',
-        'Mouse Gaming',
-        'Auriculares',
-        'Webcams',
-        'Micrófonos',
-        'Alfombrillas',
-      ],
-    },
-  ]
-
-  // Categorías principales que se muestran en la barra (sin dropdown)
-  const mainCategories = [
+  // Definimos qué categorías se muestran directamente en la barra inferior.
+  // TypeScript validará que estos strings existan exactamente en CATEGORY_DATA.
+  const mainCategoriesToShow: readonly MainCategoryName[] = [
     'Procesadores',
     'Placas de video',
-    'Memorias',
+    'Memorias RAM',
     'Fuentes',
     'Gabinetes',
     'Monitores',
-    'Perifericos',
+    'Periféricos',
     'Outlet',
   ]
 
   return (
-    <header className="w-full bg-gradient-to-b from-zinc-900 to-zinc-950 text-white sticky top-0 z-50 shadow-xl backdrop-blur-sm">
+    <header className="w-full bg-linear-to-b from-zinc-900 to-zinc-950 text-white sticky top-0 z-50 shadow-xl backdrop-blur-sm">
       {/* Contenedor principal con padding lateral */}
-      <div className="max-w-screen-xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto px-4">
         {/* FILA SUPERIOR: Logo, Buscador y Acciones */}
         <div className="flex items-center justify-between py-4 gap-x-6 md:gap-x-10">
-          {/* 1. Logo moderno con tipografía actualizada */}
-          <div className="flex-shrink-0 cursor-pointer group">
-            <div className="flex items-center gap-x-2">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-500 rounded-lg flex items-center justify-center font-black text-xl transform group-hover:scale-105 transition-transform duration-300">
+          {/* 1. Logo moderno */}
+          <div className="shrink-0 cursor-pointer group">
+            <a href="/" className="flex items-center gap-x-2">
+              <div className="w-10 h-10 bg-linear-to-br from-blue-600 to-blue-500 rounded-lg flex items-center justify-center font-black text-xl transform group-hover:scale-105 transition-transform duration-300">
                 B
               </div>
               <div className="flex flex-col leading-none">
-                <span className="text-xl font-black tracking-tighter bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">
+                <span className="text-xl font-black tracking-tighter bg-linear-to-r from-white to-zinc-400 bg-clip-text text-transparent">
                   ByB
                 </span>
                 <span className="text-[10px] font-semibold text-zinc-500 tracking-widest uppercase">
                   Tech Store
                 </span>
               </div>
-            </div>
+            </a>
           </div>
 
           {/* 2. Buscador simplificado */}
@@ -124,8 +74,8 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* FILA INFERIOR: Navegación de categorías */}
-        <Subcategories categories={dropdownCategories} mainCategories={mainCategories} />
+        {/* FILA INFERIOR: Navegación de categorías dinámicas */}
+        <Subcategories categories={CATEGORY_DATA} mainCategories={mainCategoriesToShow} />
       </div>
     </header>
   )
