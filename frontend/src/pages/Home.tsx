@@ -1,18 +1,26 @@
 import HeroSection from '../components/HeroSection'
-import ProductSection from '../components/ProductSection'
+import CarouselSection from '../components/CarouselSection'
 import PromoBanners from '../components/PromoBanners'
 import sampleProducts from '../data/products'
 
 const Home = () => {
-  return (
-    <div>
-      <HeroSection />
-      <ProductSection firstPart="Últimos" secondPart="Ingresos" products={sampleProducts} />
-      <PromoBanners />
-      <ProductSection firstPart="Productos" secondPart="Destacados" products={sampleProducts} />
-      <ProductSection firstPart="Productos en" secondPart="Oferta" products={sampleProducts} />
-    </div>
-  )
+    return (
+        <div>
+            <HeroSection />
+            <CarouselSection firstPart="Últimos" secondPart="Ingresos" products={sampleProducts} />
+            <PromoBanners />
+            <CarouselSection
+                firstPart="Productos"
+                secondPart="Destacados"
+                products={sampleProducts}
+            />
+            <CarouselSection
+                firstPart="Productos en"
+                secondPart="Oferta"
+                products={sampleProducts}
+            />
+        </div>
+    )
 }
 
 export default Home
