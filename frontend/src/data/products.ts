@@ -8,7 +8,12 @@ const sampleProducts: Product[] = [
         price: 550000,
         stock: 5,
         category: 'Procesadores',
-        imageUrl: 'https://via.placeholder.com/400',
+        imageUrl:
+            'https://fullh4rd.com.ar/img/productos/1/micro-amd-ryzen-7-7800x3d-cvideo-scooler-am5-0.jpg',
+        images: [
+            'https://fullh4rd.com.ar/img/productos/1/micro-amd-ryzen-7-7800x3d-cvideo-scooler-am5-0.jpg',
+            'https://app.contabilium.com/files/explorer/7026/Productos-Servicios/concepto-19782081.jpg',
+        ],
         isActive: true,
         creationDate: new Date(),
     },
