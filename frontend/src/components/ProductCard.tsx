@@ -1,18 +1,21 @@
 import type { Product } from '../types/product'
 import { useCart } from '../hooks/useCart'
+import { Navigate, useNavigate } from 'react-router'
 
 interface ProductCardProps {
     product: Product
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+    const navigate = useNavigate()
     const { addToCart } = useCart()
     return (
         <article className="group bg-zinc-900/50 border border-zinc-800 rounded-xl overflow-hidden hover:border-blue-500/50 transition-all duration-300 flex flex-col">
-            <div className="aspect-square bg-white/95 flex items-center justify-center overflow-hidden">
+            <div className="aspect-square bg-white/95 flex items-center justify-center overflow-hidden hover:cursor-pointer">
                 <img
                     src={product.imageUrl}
                     alt={product.name}
+                    onClick={() => navigate(`/producto/${product.id}`)}
                     className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500"
                 />
             </div>
