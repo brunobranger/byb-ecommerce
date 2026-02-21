@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { ShoppingCart, Shield, Truck, CheckCircle, Copy } from 'lucide-react'
 import type { Product } from '../types/product'
+import DataSheet from './DataSheet'
 
 interface ProductDetailsProps {
     product: Product
@@ -10,12 +11,12 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
     // Estado para manejar qué imagen se muestra en grande (índice de la imagen activa)
     const [selectedImage, setSelectedImage] = useState(0)
 
-    // Imágenes del producto (asumiendo que Product tiene un array de images)
+    // Imágenes del producto
     const images = product.images?.length
         ? product.images
         : [product.imageUrl ?? '', product.imageUrl ?? '', product.imageUrl ?? '']
 
-    // Precio con tarjeta: 15% más que el precio base (ajustá el porcentaje a tu lógica)
+    // Precio con tarjeta: 15% más que el precio base (despues seguramente lo cambie)
     const cardPrice = (product.price * 1.15).toLocaleString('es-AR')
     const cashPrice = product.price.toLocaleString('es-AR')
     const installmentPrice = ((product.price * 1.15) / 6).toLocaleString('es-AR', {
@@ -37,7 +38,7 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
                         />
                     </div>
 
-                    {/* Swiper con imagenes (la primera siempre es la que se esta mostrando) */}
+                    {/* Swiper con imagenes (la primera siempre es la que se esta mostrando apenas se entra a la pagina) */}
                     <div className="flex gap-3">
                         {images.map((img, index) => (
                             <button
@@ -101,7 +102,7 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
                                 Mejor precio
                             </span>
                             <span className="text-3xl font-black text-zinc-800">$ {cashPrice}</span>
-                            {/* Aca podriamos agregar algunos detalles mas de "abonando con efectivo o transferencia o deposito bancario" */}
+                            {/* Aca van algunos detalles como "abonando con efectivo o transferencia o deposito bancario" */}
                             <span className="text-sm text-blue-400 font-medium">
                                 5% de descuento abonando con efectivo, transferencia o depósito
                             </span>
@@ -148,13 +149,14 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
 
                     <button
                         type="button"
-                        className="flex items-center justify-center gap-3 w-full sm:w-auto sm:px-10 py-4 rounded-xl font-black text-white text-base tracking-wide bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 active:scale-95 transition-all duration-200 shadow-lg shadow-blue-600/30"
+                        className="flex items-center justify-center gap-3 w-full sm:w-auto sm:px-10 py-4 rounded-xl font-black text-white text-base tracking-wide bg-linear-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 active:scale-95 transition-all duration-200 shadow-lg shadow-blue-600/30"
                     >
                         <ShoppingCart size={20} />
                         Agregar al carrito
                     </button>
                 </div>
             </section>
+            <DataSheet product={product} />
         </div>
     )
 }
