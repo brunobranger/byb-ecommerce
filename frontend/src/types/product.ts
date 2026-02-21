@@ -1,14 +1,17 @@
 import type { MainCategoryName, SubcategoryName } from './category'
-
-export type Product = {
+import type { AllProductSpecs } from './specs'
+// Definimos Product con un genérico T para que acepte cualquier tipo de specs, segun el producto que sea
+// (esto sirve para la ficha tecnica del producto)
+export type Product<T = AllProductSpecs> = {
     id: string
     name: string
     price: number
     stock: number
-    category: MainCategoryName // Solo permitirá nombres del array CATEGORY_DATA
-    subcategory?: SubcategoryName // Solo permitirá items de las subcategorías
+    category: MainCategoryName
+    subcategory?: SubcategoryName
     imageUrl?: string
-    images?: string[] // La diferencia con imageUrl es que, imageUrl es la principal de los carrusel e images es la de productDetails
+    images?: string[]
     isActive: boolean
     creationDate: Date
+    specs?: T
 }
