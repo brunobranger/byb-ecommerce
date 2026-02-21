@@ -1,4 +1,5 @@
 import type { Product } from '../types/product'
+import type { CPUSpecs, GPUSpecs } from '../types/specs'
 
 // Datos de ejemplo (Mocks) siguiendo el tipo Product
 const sampleProducts: Product[] = [
@@ -16,6 +17,26 @@ const sampleProducts: Product[] = [
         ],
         isActive: true,
         creationDate: new Date(),
+        specs: {
+            // General
+            model: '7800X3D',
+            family: 'Ryzen 7000 Series',
+            socket: 'AM5',
+            integratedGpu: 'AMD Radeon Graphics (RDNA 2)',
+            overclock: false,
+            // Especificaciones de la CPU
+            cores: 8,
+            threads: 16,
+            frequence: 4200,
+            turboFrequence: 5000,
+            // Coolers y disipadores
+            coolerCpu: false,
+            tdp: '120 W',
+            // Memoria cache
+            l1: '512 KB',
+            l2: '8 MB',
+            l3: '96 MB',
+        } satisfies CPUSpecs,
     },
     {
         id: '2',
@@ -27,6 +48,41 @@ const sampleProducts: Product[] = [
             'https://asset.msi.com/resize/image/global/product/product_17046991811c9eb5d51a82095c16a47e5200365e92.png62405b38c58fe0f07fcef2367d8a9ba1/1024.avif',
         isActive: true,
         creationDate: new Date(),
+        specs: {
+            // General
+            brand: 'NVIDIA',
+            model: 'GeForce RTX 4070 Ti Super',
+            architecture: 'Ada Lovelace (AD103)',
+            coreFreq: 2340,
+            turboFreq: 2610,
+            // Memoria
+            memoryType: 'GDDR6X',
+            memoryCap: 16,
+            memoryFreq: 21000,
+            memoryInterface: 256,
+            // Procesadores de stream
+            processType: 'CUDA',
+            processQuantity: 8448,
+            // Dimensiones
+            width: '137 mm',
+            length: '304 mm',
+            // Conectividad
+            vga: 0,
+            dvi: 0,
+            hdmi: 1,
+            displayPorts: 3,
+            // Energia
+            consumption: 285,
+            wattsRecommended: 700,
+            pcie6: 0,
+            pcie8: 0,
+            pcie16adaptors: 1,
+            pcie16: 1,
+            // Coolers y disipadores
+            backplate: true,
+            blockVgaWater: false,
+            coolersFan: 3,
+        } satisfies GPUSpecs,
     },
     {
         id: '3',
