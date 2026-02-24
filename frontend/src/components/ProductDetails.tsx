@@ -17,9 +17,10 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
         : [product.imageUrl ?? '', product.imageUrl ?? '', product.imageUrl ?? '']
 
     // Precio con tarjeta: 15% más que el precio base (despues seguramente lo cambie)
-    const cardPrice = (product.price * 1.15).toLocaleString('es-AR')
+    // Update: Lo actualice a 20%
+    const cardPrice = (product.price * 1.2).toLocaleString('es-AR')
     const cashPrice = product.price.toLocaleString('es-AR')
-    const installmentPrice = ((product.price * 1.15) / 6).toLocaleString('es-AR', {
+    const installmentPrice = ((product.price * 1.2) / 6).toLocaleString('es-AR', {
         maximumFractionDigits: 0,
     })
 
@@ -104,7 +105,9 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
                             <span className="text-3xl font-black text-zinc-800">$ {cashPrice}</span>
                             {/* Aca van algunos detalles como "abonando con efectivo o transferencia o deposito bancario" */}
                             <span className="text-sm text-blue-400 font-medium">
-                                5% de descuento abonando con efectivo, transferencia o depósito
+                                {/* Ya que pagar en 1 solo pago con tarjeta es 10% mas caro */}
+                                10% de descuento abonando con efectivo, transferencia o
+                                depósito{' '}
                             </span>
                         </div>
 

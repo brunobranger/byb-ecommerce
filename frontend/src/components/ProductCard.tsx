@@ -1,6 +1,6 @@
 import type { Product } from '../types/product'
 import { useCart } from '../hooks/useCart'
-import { Navigate, useNavigate } from 'react-router'
+import { useNavigate } from 'react-router'
 
 interface ProductCardProps {
     product: Product

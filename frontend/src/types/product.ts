@@ -6,6 +6,7 @@ export type Product<T = AllProductSpecs> = {
     id: string
     name: string
     price: number
+    priceList: number
     stock: number
     category: MainCategoryName
     subcategory?: SubcategoryName

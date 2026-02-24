@@ -1,21 +1,35 @@
 import { Link } from 'react-router'
-import { useCart } from '../hooks/useCart'
 
-type Step = 'cart' | 'shipping' | 'payment'
+type Step = 'cart' | 'shipping' | 'payment' | 'credit_card' | 'billing' | 'confirmation'
 
 interface OrderSummaryProps {
     step: Step
     onNext: () => void
     onBack: () => void
+    subtotal: number
+    total: number
     shippingCost: number | null // null = no elegido todavía, 0 = retiro gratis
-    canContinue: boolean // habilita/deshabilita el botón de continuar
+    canContinue: boolean
 }
 
-const OrderSummary = ({ step, onNext, onBack, shippingCost, canContinue }: OrderSummaryProps) => {
-    const { cartItems } = useCart()
+// Etiqueta del botón principal según el step
+const nextButtonLabel: Partial<Record<Step, string>> = {
+    cart: 'Iniciar compra',
+    shipping: 'Continuar',
+    payment: 'Continuar',
+    credit_card: 'Continuar',
+}
 
-    const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0)
-    const total = subtotal + (shippingCost ?? 0)
+const OrderSummary = ({
+    step,
+    onNext,
+    onBack,
+    subtotal,
+    total,
+    shippingCost,
+    canContinue,
+}: OrderSummaryProps) => {
+    const nextLabel = nextButtonLabel[step]
 
     return (
         <div className="lg:col-span-4 bg-white/5 border border-white/10 rounded-3xl p-8 sticky top-24 backdrop-blur-md">
@@ -23,14 +37,12 @@ const OrderSummary = ({ step, onNext, onBack, shippingCost, canContinue }: Order
 
             <ul className="space-y-4 mb-6">
                 <li className="flex justify-between items-center">
-                    <span>
-                        {cartItems.length} {cartItems.length === 1 ? 'producto' : 'productos'}
-                    </span>
+                    <span className="text-sm text-gray-500">Productos</span>
                     <span className="font-bold">$ {subtotal.toLocaleString()}</span>
                 </li>
 
-                {/* Fila de envío — solo aparece en el step de shipping */}
-                {step === 'shipping' && (
+                {/* Fila de envío — aparece desde shipping en adelante */}
+                {step !== 'cart' && (
                     <li className="flex justify-between items-center text-sm">
                         <span className="text-gray-500">Envío</span>
                         <span className="font-semibold">
@@ -70,51 +82,42 @@ const OrderSummary = ({ step, onNext, onBack, shippingCost, canContinue }: Order
             </div>
 
             <div className="flex flex-col gap-3">
-                {step === 'cart' ? (
-                    <>
-                        {/* Step: carrito — Iniciar compra + Ver más productos */}
-                        <button
-                            type="button"
-                            onClick={onNext}
-                            className="w-full bg-blue-900 hover:bg-blue-800 py-4 rounded-xl font-bold uppercase tracking-widest transition-all active:scale-95 shadow-lg shadow-blue-950/50 text-white"
-                        >
-                            Iniciar compra
-                        </button>
+                {/* Botón principal — Iniciar compra / Continuar */}
+                {nextLabel && (
+                    <button
+                        type="button"
+                        onClick={onNext}
+                        disabled={!canContinue}
+                        className={`w-full py-4 rounded-xl font-bold uppercase tracking-widest transition-all text-white
+                            ${
+                                canContinue
+                                    ? 'bg-blue-900 hover:bg-blue-800 active:scale-95 shadow-lg shadow-blue-950/50'
+                                    : 'bg-blue-900/30 cursor-not-allowed'
+                            }`}
+                    >
+                        {nextLabel}
+                    </button>
+                )}
 
-                        <Link
-                            to="/productos"
-                            className="w-full py-3 rounded-xl border border-blue-900 text-blue-400 font-bold hover:bg-blue-900/10 transition-colors text-center text-sm"
-                        >
-                            VER MÁS PRODUCTOS
-                        </Link>
-                    </>
-                ) : (
-                    <>
-                        {/* Step: shipping o payment — Continuar + Anterior */}
-                        {step === 'shipping' && (
-                            <button
-                                type="button"
-                                onClick={onNext}
-                                disabled={!canContinue}
-                                className={`w-full py-4 rounded-xl font-bold uppercase tracking-widest transition-all text-white
-                                    ${
-                                        canContinue
-                                            ? 'bg-blue-900 hover:bg-blue-800 active:scale-95 shadow-lg shadow-blue-950/50'
-                                            : 'bg-blue-900/30 cursor-not-allowed'
-                                    }`}
-                            >
-                                Continuar
-                            </button>
-                        )}
+                {/* Ver más productos — solo en cart */}
+                {step === 'cart' && (
+                    <Link
+                        to="/productos"
+                        className="w-full py-3 rounded-xl border border-blue-900 text-blue-400 font-bold hover:bg-blue-900/10 transition-colors text-center text-sm"
+                    >
+                        VER MÁS PRODUCTOS
+                    </Link>
+                )}
 
-                        <button
-                            type="button"
-                            onClick={onBack}
-                            className="w-full py-3 rounded-xl border border-blue-900 text-blue-900 font-bold hover:bg-blue-900/10 transition-colors text-center text-sm"
-                        >
-                            Anterior
-                        </button>
-                    </>
+                {/* Anterior — en todos los steps excepto cart */}
+                {step !== 'cart' && (
+                    <button
+                        type="button"
+                        onClick={onBack}
+                        className="w-full py-3 rounded-xl border border-blue-900 text-blue-900 font-bold hover:bg-blue-900/10 transition-colors text-center text-sm"
+                    >
+                        Anterior
+                    </button>
                 )}
             </div>
 

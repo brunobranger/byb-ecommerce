@@ -1,4 +1,4 @@
-import { paymentMethods } from '../types/paymentMethods'
+import { paymentMethods } from '../data/paymentMethods'
 import type { PaymentMethodId } from '../types/paymentMethod'
 
 // Datos bancarios hardcodeados por ahora
