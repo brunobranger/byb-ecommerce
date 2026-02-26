@@ -5,7 +5,7 @@ export interface CartItem extends Product {
 }
 
 export interface Cart {
-    items: CartItem
+    items: CartItem[]
     totalItems: number
     totalPrice: number
 }
