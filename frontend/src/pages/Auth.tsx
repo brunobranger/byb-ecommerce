@@ -1,6 +1,11 @@
 import { useState } from 'react'
+import { useAuth } from '../context/AuthContext'
+import { useNavigate } from 'react-router'
 
 const Auth = () => {
+    const { login, loading: authLoading } = useAuth()
+    const navigate = useNavigate()
+
     // Estados para la vista y visibilidad
     const [isLogin, setIsLogin] = useState(true)
     const [showPassword, setShowPassword] = useState(false)
@@ -8,10 +13,11 @@ const Auth = () => {
     // Estados para los datos y errores
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    const [phone, setPhone] = useState('') // Estado para el tel en registro
     const [errors, setErrors] = useState({ email: false, password: false })
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault() // Evita que la página se recargue sola
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault()
 
         // Validamos si están vacíos
         const emailError = email.trim() === ''
@@ -23,8 +29,21 @@ const Auth = () => {
         })
 
         if (!emailError && !passwordError) {
-            console.log('Formulario enviado con:', { email, password })
-            // Logica de la API (mas adelante)
+            try {
+                // Si es login, llamamos a la función del contexto
+                if (isLogin) {
+                    await login(email, password)
+                    navigate('/perfil')
+                } else {
+                    // Por ahora el register lo simulamos
+                    console.log('Registrando con:', { email, password, phone })
+                    await login(email, password) // Login automático tras registro
+                    navigate('/perfil')
+                }
+            } catch (error) {
+                console.error('Error en la autenticación:', error)
+                alert('Credenciales incorrectas')
+            }
         }
     }
 
@@ -36,10 +55,10 @@ const Auth = () => {
                 className="bg-white/5 backdrop-blur-md border border-white/10 p-10 rounded-2xl shadow-2xl w-full max-w-md flex flex-col gap-6 text-black"
             >
                 <div className="text-center mb-4">
-                    <h2 className="text-3xl font-black uppercase tracking-tighter">
+                    <h2 className="text-3xl font-black uppercase tracking-tighter text-black">
                         {isLogin ? 'Bienvenido' : 'Crear Cuenta'}
                     </h2>
-                    <p className="text-sm text-black">
+                    <p className="text-sm text-gray-400">
                         {isLogin
                             ? 'Ingresa tus credenciales para continuar'
                             : 'Completa los datos para registrarte'}
@@ -54,9 +73,9 @@ const Auth = () => {
                             value={email}
                             onChange={e => setEmail(e.target.value)}
                             placeholder="Email..."
-                            className={`bg-black/40 border ${errors.email ? 'border-red-500' : 'border-white/10'} rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all`}
+                            disabled={authLoading}
+                            className={`bg-black/40 border ${errors.email ? 'border-red-500' : 'border-white/10'} rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all disabled:opacity-50`}
                         />
-                        {/* Mensaje condicional */}
                         {errors.email && (
                             <span className="text-[10px] text-red-500 font-bold uppercase ml-1 animate-pulse">
                                 Por favor ingresa tu mail
@@ -67,6 +86,8 @@ const Auth = () => {
                     {!isLogin && (
                         <input
                             type="tel"
+                            value={phone}
+                            onChange={e => setPhone(e.target.value)}
                             placeholder="Número de teléfono..."
                             className="bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                         />
@@ -80,7 +101,8 @@ const Auth = () => {
                                 value={password}
                                 onChange={e => setPassword(e.target.value)}
                                 placeholder="Contraseña..."
-                                className={`bg-black/40 border ${errors.password ? 'border-red-500' : 'border-white/10'} rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all w-full`}
+                                disabled={authLoading}
+                                className={`bg-black/40 border ${errors.password ? 'border-red-500' : 'border-white/10'} rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all w-full disabled:opacity-50`}
                             />
                             <button
                                 type="button"
@@ -131,21 +153,23 @@ const Auth = () => {
                             </span>
                         )}
                     </div>
-
-                    {!isLogin && (
-                        <input
-                            type="password"
-                            placeholder="Confirmar contraseña..."
-                            className="bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-                        />
-                    )}
                 </div>
 
                 <button
                     type="submit"
-                    className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg uppercase tracking-widest transition-colors shadow-lg shadow-blue-900/20 mt-2"
+                    disabled={authLoading}
+                    className="bg-blue-600 hover:bg-blue-500 disabled:bg-blue-800 disabled:cursor-not-allowed text-white font-bold py-3 rounded-lg uppercase tracking-widest transition-colors shadow-lg shadow-blue-900/20 mt-2 flex items-center justify-center gap-2"
                 >
-                    {isLogin ? 'Ingresar' : 'Registrarme'}
+                    {authLoading ? (
+                        <>
+                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                            Cargando...
+                        </>
+                    ) : isLogin ? (
+                        'Ingresar'
+                    ) : (
+                        'Registrarme'
+                    )}
                 </button>
 
                 <p className="text-gray-400 text-xs text-center">
@@ -154,7 +178,7 @@ const Auth = () => {
                         type="button"
                         onClick={() => {
                             setIsLogin(!isLogin)
-                            setErrors({ email: false, password: false }) // Limpiamos errores al cambiar de vista
+                            setErrors({ email: false, password: false })
                         }}
                         className="ml-2 text-blue-500 font-bold hover:underline uppercase"
                     >
