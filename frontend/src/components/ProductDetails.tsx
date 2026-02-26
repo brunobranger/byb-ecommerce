@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { ShoppingCart, Shield, Truck, CheckCircle, Copy } from 'lucide-react'
 import type { Product } from '../types/product'
 import DataSheet from './DataSheet'
+import { useCart } from '../hooks/useCart'
 
 interface ProductDetailsProps {
     product: Product
@@ -23,6 +24,8 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
     const installmentPrice = ((product.price * 1.2) / 6).toLocaleString('es-AR', {
         maximumFractionDigits: 0,
     })
+
+    const { addToCart } = useCart()
 
     return (
         <div className="w-full max-w-7xl mx-auto py-12 px-6">
@@ -153,6 +156,7 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
                     <button
                         type="button"
                         className="flex items-center justify-center gap-3 w-full sm:w-auto sm:px-10 py-4 rounded-xl font-black text-white text-base tracking-wide bg-linear-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 active:scale-95 transition-all duration-200 shadow-lg shadow-blue-600/30"
+                        onClick={() => addToCart(product)}
                     >
                         <ShoppingCart size={20} />
                         Agregar al carrito
