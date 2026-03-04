@@ -3,46 +3,38 @@ import { useAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router'
 
 const Auth = () => {
-    const { login, loading: authLoading } = useAuth()
+    const { login, register, loading: authLoading } = useAuth()
     const navigate = useNavigate()
 
-    // Estados para la vista y visibilidad
     const [isLogin, setIsLogin] = useState(true)
     const [showPassword, setShowPassword] = useState(false)
 
-    // Estados para los datos y errores
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
-    const [phone, setPhone] = useState('') // Estado para el tel en registro
+    const [fullName, setFullName] = useState('')
+
     const [errors, setErrors] = useState({ email: false, password: false })
+    const [serverError, setServerError] = useState<string | null>(null)
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
-        // Validamos si están vacíos
         const emailError = email.trim() === ''
         const passwordError = password.trim() === ''
 
-        setErrors({
-            email: emailError,
-            password: passwordError,
-        })
+        setErrors({ email: emailError, password: passwordError })
 
         if (!emailError && !passwordError) {
             try {
-                // Si es login, llamamos a la función del contexto
                 if (isLogin) {
                     await login(email, password)
-                    navigate('/perfil')
                 } else {
-                    // Por ahora el register lo simulamos
-                    console.log('Registrando con:', { email, password, phone })
-                    await login(email, password) // Login automático tras registro
-                    navigate('/perfil')
+                    await register(fullName, email, password)
                 }
+                navigate('/perfil')
             } catch (error) {
-                console.error('Error en la autenticación:', error)
-                alert('Credenciales incorrectas')
+                console.log('Error:', error)
+                setServerError(error instanceof Error ? error.message : 'Error inesperado')
             }
         }
     }
@@ -71,7 +63,10 @@ const Auth = () => {
                         <input
                             type="email"
                             value={email}
-                            onChange={e => setEmail(e.target.value)}
+                            onChange={e => {
+                                setEmail(e.target.value)
+                                setServerError(null)
+                            }}
                             placeholder="Email..."
                             disabled={authLoading}
                             className={`bg-black/40 border ${errors.email ? 'border-red-500' : 'border-white/10'} rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all disabled:opacity-50`}
@@ -83,13 +78,18 @@ const Auth = () => {
                         )}
                     </div>
 
+                    {/* Input Nombre — solo en registro */}
                     {!isLogin && (
                         <input
-                            type="tel"
-                            value={phone}
-                            onChange={e => setPhone(e.target.value)}
-                            placeholder="Número de teléfono..."
-                            className="bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                            type="text"
+                            value={fullName}
+                            onChange={e => {
+                                setFullName(e.target.value)
+                                setServerError(null)
+                            }}
+                            placeholder="Nombre completo..."
+                            disabled={authLoading}
+                            className="bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all disabled:opacity-50"
                         />
                     )}
 
@@ -99,7 +99,10 @@ const Auth = () => {
                             <input
                                 type={showPassword ? 'text' : 'password'}
                                 value={password}
-                                onChange={e => setPassword(e.target.value)}
+                                onChange={e => {
+                                    setPassword(e.target.value)
+                                    setServerError(null)
+                                }}
                                 placeholder="Contraseña..."
                                 disabled={authLoading}
                                 className={`bg-black/40 border ${errors.password ? 'border-red-500' : 'border-white/10'} rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all w-full disabled:opacity-50`}
@@ -155,6 +158,13 @@ const Auth = () => {
                     </div>
                 </div>
 
+                {/* Error del servidor — una sola vez, antes del botón */}
+                {serverError && (
+                    <span className="text-[10px] text-red-500 font-bold uppercase ml-1 animate-pulse">
+                        {serverError}
+                    </span>
+                )}
+
                 <button
                     type="submit"
                     disabled={authLoading}
@@ -173,16 +183,17 @@ const Auth = () => {
                 </button>
 
                 <p className="text-gray-400 text-xs text-center">
-                    {isLogin ? '¿No tienes cuenta?' : '¿Ya tienes cuenta?'}
+                    {isLogin ? '¿No tenes cuenta?' : '¿Ya tenes cuenta?'}
                     <button
                         type="button"
                         onClick={() => {
                             setIsLogin(!isLogin)
                             setErrors({ email: false, password: false })
+                            setServerError(null)
                         }}
                         className="ml-2 text-blue-500 font-bold hover:underline uppercase"
                     >
-                        {isLogin ? 'Regístrate' : 'Inicia Sesión'}
+                        {isLogin ? 'Registrate' : 'Iniciá Sesión'}
                     </button>
                 </p>
             </form>

@@ -1,10 +1,12 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import type { User } from '../types/user'
 import type { ReactNode } from 'react'
+import { authService } from '../services/authService'
 
 interface AuthContextType {
     user: User | null
     login: (email: string, pass: string) => Promise<void>
+    register: (fullName: string, email: string, password: string) => Promise<void>
     logout: () => void
     isAuthenticated: boolean
     loading: boolean
@@ -16,44 +18,45 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<User | null>(null)
     const [loading, setLoading] = useState(true)
 
-    // Al cargar la app, buscamos si ya estaba logueado
+    // Al cargar la app, validamos el token guardado contra el backend
     useEffect(() => {
-        const savedUser = localStorage.getItem('app_user')
-        if (savedUser) {
-            try {
-                setUser(JSON.parse(savedUser))
-            } catch (e) {
-                localStorage.removeItem('app_user')
-            }
+        const token = localStorage.getItem('app_token')
+        if (!token) {
+            setLoading(false)
+            return
         }
-        setLoading(false)
+
+        authService
+            .me(token)
+            .then(userData => setUser(userData as User))
+            .catch(() => localStorage.removeItem('app_token'))
+            .finally(() => setLoading(false))
     }, [])
 
-    const login = async (email: string, _pass: string) => {
+    const login = async (email: string, password: string) => {
         setLoading(true)
-        // --- SIMULACIÓN DE API ---
-        await new Promise(res => setTimeout(res, 1000))
-
-        // Datos corregidos para que coincidan con el componente UserProfile
-        const mockUser: User = {
-            id: 'u-123456',
-            clientNumber: '000001',
-            fullName: 'Juan Pérez',
-            email: email,
-            phone: '11 1234-5678',
-            claseFiscal: 'Consumidor Final',
-            tipoDocumento: 'DNI',
-            dni: '12345678',
-            province: 'Buenos Aires',
-            address: 'Av. Corrientes 1234', // Ahora es string plano como pediste
-            postalCode: '1043',
-            role: 'user',
+        try {
+            const { token, user } = await authService.login(email, password)
+            localStorage.setItem('app_token', token)
+            setUser(user as User)
+        } catch (error) {
+            throw error
+        } finally {
+            setLoading(false)
         }
+    }
 
-        // Guardamos en storage y en estado
-        localStorage.setItem('app_user', JSON.stringify(mockUser))
-        setUser(mockUser)
-        setLoading(false)
+    const register = async (fullName: string, email: string, password: string): Promise<void> => {
+        setLoading(true)
+        try {
+            const { token, user } = await authService.register(fullName, email, password)
+            localStorage.setItem('app_token', token)
+            setUser(user as User)
+        } catch (error) {
+            throw error
+        } finally {
+            setLoading(false)
+        }
     }
 
     const logout = () => {
@@ -64,7 +67,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
 
     return (
-        <AuthContext.Provider value={{ user, login, logout, isAuthenticated: !!user, loading }}>
+        <AuthContext.Provider
+            value={{ user, login, register, logout, isAuthenticated: !!user, loading }}
+        >
             {children}
         </AuthContext.Provider>
     )

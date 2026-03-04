@@ -5,7 +5,7 @@ import User from '../models/User'
 
 const generateToken = (userId: string, role: string): string => {
     const secret = process.env.JWT_SECRET
-    if (!secret) throw new Error('JWT_SECRET no definida')
+    if (!secret) throw new Error('JWT_SECRET not defined')
     return jwt.sign({ userId, role }, secret, { expiresIn: '7d' })
 }
 
@@ -16,7 +16,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 
         const existingUser = await User.findOne({ email })
         if (existingUser) {
-            res.status(400).json({ message: 'El email ya está registrado' })
+            res.status(400).json({ message: 'Email already registered' })
             return
         }
 
@@ -46,7 +46,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
             },
         })
     } catch (error) {
-        res.status(500).json({ message: 'Error en el registro' })
+        res.status(500).json({ message: 'Register error' })
     }
 }
 
@@ -57,13 +57,13 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 
         const user = await User.findOne({ email })
         if (!user) {
-            res.status(401).json({ message: 'Credenciales inválidas' })
+            res.status(401).json({ message: 'Invalid credentials' })
             return
         }
 
         const isMatch = await bcrypt.compare(password, user.password)
         if (!isMatch) {
-            res.status(401).json({ message: 'Credenciales inválidas' })
+            res.status(401).json({ message: 'Invalid credentials' })
             return
         }
 
@@ -80,7 +80,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
             },
         })
     } catch (error) {
-        res.status(500).json({ message: 'Error en el login' })
+        res.status(500).json({ message: 'Login error' })
     }
 }
 
@@ -90,11 +90,11 @@ export const me = async (req: Request, res: Response): Promise<void> => {
         const userId = (req as { userId?: string }).userId
         const user = await User.findById(userId).select('-password')
         if (!user) {
-            res.status(404).json({ message: 'Usuario no encontrado' })
+            res.status(404).json({ message: 'User not found' })
             return
         }
         res.json(user)
     } catch (error) {
-        res.status(500).json({ message: 'Error obteniendo usuario' })
+        res.status(500).json({ message: 'Error obtaining the user' })
     }
 }
