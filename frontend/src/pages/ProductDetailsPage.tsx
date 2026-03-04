@@ -3,8 +3,8 @@ import sampleProducts from '../data/products'
 import ProductDetails from '../components/ProductDetails'
 
 const ProductDetailsPage = () => {
-    const { id } = useParams()
-    const product = sampleProducts.find(p => p.id === id)
+    const { slug } = useParams()
+    const product = sampleProducts.find(p => p.slug === slug)
 
     if (!product)
         return (

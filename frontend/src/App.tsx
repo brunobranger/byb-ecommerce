@@ -32,11 +32,10 @@ function App() {
                                 path="/categoria/:categorySlug/:subcategorySlug"
                                 element={<ProductsSection />}
                             />
-                            <Route path="/producto/:id" element={<ProductDetailsPage />} />
+                            <Route path="/producto/:slug" element={<ProductDetailsPage />} />{' '}
                             <Route path="/productos" element={<ProductsSection />} />
                             <Route path="/ingresar" element={<Auth />} />
                             <Route path="/carrito" element={<CartScreen />} />
-
                             {/* FIX: Ahora la ruta de perfil está protegida */}
                             <Route
                                 path="/perfil"

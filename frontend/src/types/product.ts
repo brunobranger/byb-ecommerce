@@ -4,6 +4,7 @@ import type { AllProductSpecs } from './specs'
 // (esto sirve para la ficha tecnica del producto)
 export type Product<T = AllProductSpecs> = {
     id: string
+    slug: string
     name: string
     price: number
     priceList: number

@@ -15,7 +15,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                 <img
                     src={product.imageUrl}
                     alt={product.name}
-                    onClick={() => navigate(`/producto/${product.id}`)}
+                    onClick={() => navigate(`/producto/${product.slug}`)}
                     className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500"
                 />
             </div>
