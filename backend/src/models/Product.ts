@@ -2,6 +2,7 @@ import mongoose, { Schema, type Document } from 'mongoose'
 
 export interface IProduct extends Document {
     name: string
+    slug: string
     price: number
     priceList: number
     stock: number
@@ -17,6 +18,7 @@ export interface IProduct extends Document {
 const ProductSchema = new Schema<IProduct>(
     {
         name: { type: String, required: true },
+        slug: { type: String, required: true, unique: true },
         price: { type: Number, required: true },
         priceList: { type: Number, required: true },
         stock: { type: Number, required: true, default: 0 },
@@ -32,6 +34,7 @@ const ProductSchema = new Schema<IProduct>(
 )
 
 ProductSchema.index({ category: 1 })
+ProductSchema.index({ slug: 1 })
 ProductSchema.index({ name: 'text' })
 
 export default mongoose.model<IProduct>('Product', ProductSchema)
