@@ -41,3 +41,18 @@ export const getProductById = async (req: Request, res: Response): Promise<void>
         res.status(500).json({ message: 'Error attempting to get product' })
     }
 }
+
+// GET /api/products/slug/:slug
+export const getProductBySlug = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const product = await Product.findOne({ slug: req.params.slug })
+        if (!product) {
+            res.status(404).json({ message: 'Product not found' })
+            return
+        }
+
+        res.json(product)
+    } catch (error) {
+        res.status(500).json({ message: 'Error attempting to get product' })
+    }
+}
