@@ -1,15 +1,16 @@
 import type { Product } from '../types/product'
 import type { CPUSpecs, GPUSpecs, RAMSpecs } from '../types/specs'
 
-const PRICE_LIST_MODIFIER = 1.2
+export const PRICE_LIST_MODIFIER = 1.2
 
-const rawProducts: Omit<Product, 'priceList' | 'slug'>[] = [
+export const rawProducts: Omit<Product, 'priceList' | 'slug'>[] = [
     {
         id: '1',
         name: 'Procesador AMD Ryzen 7 7800X3D AM5',
         price: 550000,
         stock: 5,
         category: 'Procesadores',
+        subcategory: 'AMD',
         imageUrl:
             'https://fullh4rd.com.ar/img/productos/1/micro-amd-ryzen-7-7800x3d-cvideo-scooler-am5-0.jpg',
         images: [
@@ -37,10 +38,11 @@ const rawProducts: Omit<Product, 'priceList' | 'slug'>[] = [
     },
     {
         id: '2',
-        name: 'Placa de Video NVIDIA RTX 4070 Ti Super',
+        name: 'Placa de Video MSI NVIDIA GeForce RTX 4070 Ti Super 16GB',
         price: 1150000,
         stock: 0,
         category: 'Placas de video',
+        subcategory: 'NVIDIA',
         imageUrl:
             'https://asset.msi.com/resize/image/global/product/product_17046991811c9eb5d51a82095c16a47e5200365e92.png62405b38c58fe0f07fcef2367d8a9ba1/1024.avif',
         images: [
@@ -84,11 +86,12 @@ const rawProducts: Omit<Product, 'priceList' | 'slug'>[] = [
         price: 185000,
         stock: 12,
         category: 'Memorias RAM',
+        subcategory: 'DDR5',
         imageUrl:
-            'https://www.fullh4rd.com.ar/img/productos/3/memoria-corsair-vengeance-rgb-32gb-2x16gb-ddr5-6000mhz-cl36-1.jpg',
+            'https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/Memory/vengeance-rgb-amd-ddr5-blk-config/Gallery/Vengeance-RGB-DDR5-2UP-32GB-GRAY_01.webp',
         images: [
-            'https://www.fullh4rd.com.ar/img/productos/3/memoria-corsair-vengeance-rgb-32gb-2x16gb-ddr5-6000mhz-cl36-1.jpg',
-            'https://fullh4rd.com.ar/img/productos/3/memoria-corsair-vengeance-rgb-32gb-2x16gb-ddr5-6000mhz-cl36-2.jpg',
+            'https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/Memory/vengeance-rgb-amd-ddr5-blk-config/Gallery/Vengeance-RGB-DDR5-2UP-32GB-GRAY_01.webp',
+            'https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/Memory/vengeance-rgb-amd-ddr5-blk-config/Gallery/Vengeance-RGB-DDR5-2UP-32GB-GRAY_02.webp',
         ],
         isActive: true,
         creationDate: new Date(),
@@ -109,11 +112,11 @@ const rawProducts: Omit<Product, 'priceList' | 'slug'>[] = [
         price: 420000,
         stock: 8,
         category: 'Procesadores',
-        imageUrl:
-            'https://www.fullh4rd.com.ar/img/productos/4/micro-amd-ryzen-5-7600x-am5-scooler-0.jpg',
+        subcategory: 'AMD',
+        imageUrl: 'https://i.ebayimg.com/images/g/F9UAAOSw~Ytlb3hN/s-l1600.jpg',
         images: [
-            'https://www.fullh4rd.com.ar/img/productos/4/micro-amd-ryzen-5-7600x-am5-scooler-0.jpg',
-            'https://fullh4rd.com.ar/img/productos/4/micro-amd-ryzen-5-7600x-am5-scooler-1.jpg',
+            'https://www.amd.com/content/dam/amd/en/images/products/processors/ryzen/2529436-ryzen-5-7600x-PIB-left-facing-1260x709.png',
+            'https://www.amd.com/content/dam/amd/en/images/products/processors/ryzen/2529436-ryzen-5-7600x-tray-1260x709.png',
         ],
         isActive: true,
         creationDate: new Date(),
@@ -136,15 +139,16 @@ const rawProducts: Omit<Product, 'priceList' | 'slug'>[] = [
     },
     {
         id: '5',
-        name: 'Placa de Video NVIDIA RTX 4060 Ti 8GB',
+        name: 'Placa de Video MSI Ventus 2X Black OC NVIDIA GeForce RTX 4060 Ti 8GB',
         price: 720000,
         stock: 6,
         category: 'Placas de video',
+        subcategory: 'NVIDIA',
         imageUrl:
-            'https://fullh4rd.com.ar/img/productos/5/vga-rtx-4060-ti-8gb-gigabyte-gaming-oc-1.jpg',
+            'https://fullh4rd.com.ar/img/productos/3/video-geforce-rtx-4060-8gb-msi-ventus-2x-black-oc-0.jpg',
         images: [
-            'https://fullh4rd.com.ar/img/productos/5/vga-rtx-4060-ti-8gb-gigabyte-gaming-oc-1.jpg',
-            'https://fullh4rd.com.ar/img/productos/5/vga-rtx-4060-ti-8gb-gigabyte-gaming-oc-2.jpg',
+            'https://fullh4rd.com.ar/img/productos/3/video-geforce-rtx-4060-8gb-msi-ventus-2x-black-oc-0.jpg',
+            'https://www.gigabyte.com/FileUpload/Global/KeyFeature/3349/images/01.jpg',
         ],
         isActive: true,
         creationDate: new Date(),
@@ -179,16 +183,13 @@ const rawProducts: Omit<Product, 'priceList' | 'slug'>[] = [
     },
     {
         id: '6',
-        name: 'Memoria RAM Kingston Fury Beast 32GB (2x16GB) DDR5 5200MHz',
+        name: 'Memoria RAM Kingston Fury Beast 32GB (2x16GB) DDR5 5200MHz CL40',
         price: 165000,
         stock: 15,
         category: 'Memorias RAM',
-        imageUrl:
-            'https://fullh4rd.com.ar/img/productos/6/memoria-kingston-fury-beast-32gb-2x16gb-ddr5-5200mhz-1.jpg',
-        images: [
-            'https://fullh4rd.com.ar/img/productos/6/memoria-kingston-fury-beast-32gb-2x16gb-ddr5-5200mhz-1.jpg',
-            'https://fullh4rd.com.ar/img/productos/6/memoria-kingston-fury-beast-32gb-2x16gb-ddr5-5200mhz-2.jpg',
-        ],
+        subcategory: 'DDR5',
+        imageUrl: 'https://goldentechstore.com.ar/wp-content/uploads/MEM180.jpg',
+        images: ['https://goldentechstore.com.ar/wp-content/uploads/MEM180.jpg'],
         isActive: true,
         creationDate: new Date(),
         specs: {
@@ -208,11 +209,12 @@ const rawProducts: Omit<Product, 'priceList' | 'slug'>[] = [
         price: 480000,
         stock: 4,
         category: 'Procesadores',
+        subcategory: 'Intel',
         imageUrl:
-            'https://fullh4rd.com.ar/img/productos/7/micro-intel-core-i5-14600k-lga1700-scooler-0.jpg',
+            'https://app.contabilium.com/files/explorer/48428/Productos-Servicios/concepto-15063705.jpg',
         images: [
-            'https://fullh4rd.com.ar/img/productos/7/micro-intel-core-i5-14600k-lga1700-scooler-0.jpg',
-            'https://fullh4rd.com.ar/img/productos/7/micro-intel-core-i5-14600k-lga1700-scooler-1.jpg',
+            'https://app.contabilium.com/files/explorer/48428/Productos-Servicios/concepto-15063705.jpg',
+            'https://www.intel.com/content/dam/www/public/us/en/images/photography-consumer/rwd/processors/core-i5-14600k-processor-rwd.png',
         ],
         isActive: true,
         creationDate: new Date(),
@@ -235,15 +237,16 @@ const rawProducts: Omit<Product, 'priceList' | 'slug'>[] = [
     },
     {
         id: '8',
-        name: 'Placa de Video AMD Radeon RX 7600 8GB',
+        name: 'Placa de Video ASUS Dual EVO OC Edition AMD Radeon RX 7600 8GB',
         price: 580000,
         stock: 10,
         category: 'Placas de video',
+        subcategory: 'AMD Radeon',
         imageUrl:
-            'https://fullh4rd.com.ar/img/productos/8/vga-radeon-rx-7600-8gb-sapphire-pulse-1.jpg',
+            'https://fullh4rd.com.ar/img/productos/3/placa-de-video-radeon-rx-7600-8gb-asus-dual-evo-oc-edition-0.jpg',
         images: [
-            'https://fullh4rd.com.ar/img/productos/8/vga-radeon-rx-7600-8gb-sapphire-pulse-1.jpg',
-            'https://fullh4rd.com.ar/img/productos/8/vga-radeon-rx-7600-8gb-sapphire-pulse-2.jpg',
+            'https://fullh4rd.com.ar/img/productos/3/placa-de-video-radeon-rx-7600-8gb-asus-dual-evo-oc-edition-0.jpg',
+            'https://media.cdn.sapphiretech.com.cn/-/media/sites/sapphire/pim/product-images/11324_01_rx7600_pulse_8ggddr6/rx7600_pulse_c07_r_light_374x265.ashx',
         ],
         isActive: true,
         creationDate: new Date(),
@@ -277,41 +280,16 @@ const rawProducts: Omit<Product, 'priceList' | 'slug'>[] = [
         } as GPUSpecs,
     },
     {
-        id: '9',
-        name: 'Memoria RAM G.Skill Trident Z5 RGB 32GB (2x16GB) DDR5 6400MHz',
-        price: 210000,
-        stock: 7,
-        category: 'Memorias RAM',
-        imageUrl:
-            'https://fullh4rd.com.ar/img/productos/9/memoria-gskill-trident-z5-rgb-32gb-ddr5-6400mhz-1.jpg',
-        images: [
-            'https://fullh4rd.com.ar/img/productos/9/memoria-gskill-trident-z5-rgb-32gb-ddr5-6400mhz-1.jpg',
-            'https://fullh4rd.com.ar/img/productos/9/memoria-gskill-trident-z5-rgb-32gb-ddr5-6400mhz-2.jpg',
-        ],
-        isActive: true,
-        creationDate: new Date(),
-        specs: {
-            capacity: 32,
-            freq: 6400,
-            type: 'DDR5',
-            latency: 32,
-            wattage: 1.35,
-            heatsink: true,
-            highHeatsink: true,
-            sodimm: false,
-        } as RAMSpecs,
-    },
-    {
         id: '10',
         name: 'Monitor Samsung Odyssey G5 27" 165Hz',
         price: 480000,
         stock: 3,
         category: 'Monitores',
-        imageUrl:
-            'https://fullh4rd.com.ar/img/productos/10/monitor-samsung-odyssey-g5-27-165hz-1.jpg',
+        subcategory: '2K',
+        imageUrl: 'https://http2.mlstatic.com/D_NQ_NP_642963-MLA99509427188_112025-O.webp',
         images: [
-            'https://fullh4rd.com.ar/img/productos/10/monitor-samsung-odyssey-g5-27-165hz-1.jpg',
-            'https://fullh4rd.com.ar/img/productos/10/monitor-samsung-odyssey-g5-27-165hz-2.jpg',
+            'https://http2.mlstatic.com/D_NQ_NP_642963-MLA99509427188_112025-O.webp',
+            'https://image-us.samsung.com/SamsungUS/home/computing/monitors/gaming/all-gaming-monitors/02252021/C27G55TQWN/gallery/C27G55TQWN-002-SideTilt.jpg',
         ],
         isActive: true,
         creationDate: new Date(),
@@ -322,10 +300,11 @@ const rawProducts: Omit<Product, 'priceList' | 'slug'>[] = [
         price: 120000,
         stock: 8,
         category: 'Fuentes',
-        imageUrl: 'https://fullh4rd.com.ar/img/productos/11/fuente-evga-750w-80-plus-gold-1.jpg',
+        subcategory: '750W',
+        imageUrl: 'https://images.evga.com/products/gallery/png/220-G6-0750-X1_LG_1.png',
         images: [
-            'https://fullh4rd.com.ar/img/productos/11/fuente-evga-750w-80-plus-gold-1.jpg',
-            'https://fullh4rd.com.ar/img/productos/11/fuente-evga-750w-80-plus-gold-2.jpg',
+            'https://images.evga.com/products/gallery/png/220-G6-0750-X1_LG_1.png',
+            'https://images.evga.com/products/gallery/png/220-G6-0750-X1_LG_2.png',
         ],
         isActive: true,
         creationDate: new Date(),
@@ -336,12 +315,17 @@ const rawProducts: Omit<Product, 'priceList' | 'slug'>[] = [
 
     {
         id: '12',
-        name: 'Corsair Vengeance RGB 64GB (2x32GB) DDR5 6000MHz CL30',
+        name: 'Memoria RAM Corsair Vengeance RGB 64GB (2x32GB) DDR5 6000MHz CL30',
         price: 320000,
         stock: 6,
         category: 'Memorias RAM',
-        imageUrl: 'https://www.corsair.com/vengeance-rgb-64gb.jpg',
-        images: ['https://www.corsair.com/vengeance-rgb-64gb-1.jpg'],
+        subcategory: 'DDR5',
+        imageUrl:
+            'https://www.deffo.com.ar/wp-content/uploads/2024/08/VENGEANCE-RGB-DDR5-Negro-1-600x600.webp',
+        images: [
+            'https://www.deffo.com.ar/wp-content/uploads/2024/08/VENGEANCE-RGB-DDR5-Negro-1-600x600.webp',
+            'https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/Memory/CMH64GX5M2B6000Z30/Gallery/CMH64GX5M2B6000Z30_02.webp',
+        ],
         isActive: true,
         creationDate: new Date(),
         specs: {
@@ -360,12 +344,16 @@ const rawProducts: Omit<Product, 'priceList' | 'slug'>[] = [
     },
     {
         id: '13',
-        name: 'G.Skill Trident Z5 RGB 32GB (2x16GB) DDR5 6400MHz CL32',
+        name: 'Memoria RAM G.Skill Trident Z5 RGB 32GB (2x16GB) DDR5 6400MHz CL32',
         price: 210000,
         stock: 12,
         category: 'Memorias RAM',
-        imageUrl: 'https://www.gskill.com/trident-z5-rgb.jpg',
-        images: ['https://www.gskill.com/trident-z5-rgb-1.jpg'],
+        subcategory: 'DDR5',
+        imageUrl: 'https://http2.mlstatic.com/D_Q_NP_911330-MLA99920277667_112025-O.webp',
+        images: [
+            'https://http2.mlstatic.com/D_Q_NP_911330-MLA99920277667_112025-O.webp',
+            'https://www.gskill.com/img/features/F5-6400J3239G16GX2-TZ5RK/F5-6400J3239G16GX2-TZ5RK-product-02.jpg',
+        ],
         isActive: true,
         creationDate: new Date(),
         specs: {
@@ -384,12 +372,16 @@ const rawProducts: Omit<Product, 'priceList' | 'slug'>[] = [
     },
     {
         id: '14',
-        name: 'Kingston FURY Beast 32GB (2x16GB) DDR5 6000MHz CL36',
+        name: 'Memoria RAM Kingston FURY Beast 32GB (2x16GB) DDR5 6000MHz CL36',
         price: 175000,
         stock: 15,
         category: 'Memorias RAM',
-        imageUrl: 'https://www.kingston.com/fury-beast.jpg',
-        images: ['https://www.kingston.com/fury-beast-1.jpg'],
+        subcategory: 'DDR5',
+        imageUrl: 'https://goldentechstore.com.ar/wp-content/uploads/MEM180.jpg',
+        images: [
+            'https://goldentechstore.com.ar/wp-content/uploads/MEM180.jpg',
+            'https://c1.neweggimages.com/ProductImageCompressAll1280/20-242-703-V02.jpg',
+        ],
         isActive: true,
         creationDate: new Date(),
         specs: {
@@ -408,12 +400,17 @@ const rawProducts: Omit<Product, 'priceList' | 'slug'>[] = [
     },
     {
         id: '15',
-        name: 'Corsair Vengeance LPX 32GB (2x16GB) DDR5 5600MHz CL36',
+        name: 'Memoria RAM Corsair Vengeance LPX 32GB (2x16GB) DDR5 5600MHz CL36',
         price: 155000,
         stock: 20,
         category: 'Memorias RAM',
-        imageUrl: 'https://www.corsair.com/vengeance-lpx.jpg',
-        images: ['https://www.corsair.com/vengeance-lpx-1.jpg'],
+        subcategory: 'DDR5',
+        imageUrl:
+            'https://arrichetta.com.ar/wp-content/uploads/2025/06/51mEWBFy7cL._AC_UF8941000_QL80_.jpg',
+        images: [
+            'https://arrichetta.com.ar/wp-content/uploads/2025/06/51mEWBFy7cL._AC_UF8941000_QL80_.jpg',
+            'https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/Memory/CMK32GX5M2B5600C36/Gallery/CMK32GX5M2B5600C36_02.webp',
+        ],
         isActive: true,
         creationDate: new Date(),
         specs: {
@@ -432,12 +429,16 @@ const rawProducts: Omit<Product, 'priceList' | 'slug'>[] = [
     },
     {
         id: '16',
-        name: 'G.Skill Ripjaws S5 48GB (2x24GB) DDR5 6400MHz CL40',
+        name: 'Memoria RAM G.Skill Ripjaws S5 48GB (2x24GB) DDR5 6400MHz CL40',
         price: 280000,
         stock: 8,
         category: 'Memorias RAM',
-        imageUrl: 'https://www.gskill.com/ripjaws-s5.jpg',
-        images: ['https://www.gskill.com/ripjaws-s5-1.jpg'],
+        subcategory: 'DDR5',
+        imageUrl: 'https://ar-hard.com.ar/wp-content/uploads/Trident_Z5_Neo_RGB_Black_1.jpg',
+        images: [
+            'https://ar-hard.com.ar/wp-content/uploads/Trident_Z5_Neo_RGB_Black_1.jpg',
+            'https://www.gskill.com/img/features/F5-6400J4048F24GX2-RS5K/F5-6400J4048F24GX2-RS5K-product-02.jpg',
+        ],
         isActive: true,
         creationDate: new Date(),
         specs: {
@@ -464,8 +465,12 @@ const rawProducts: Omit<Product, 'priceList' | 'slug'>[] = [
         price: 2350000,
         stock: 2,
         category: 'Placas de video',
-        imageUrl: 'https://asset.msi.com/rtx4090-suprim.jpg',
-        images: ['https://asset.msi.com/rtx4090-suprim-1.jpg'],
+        subcategory: 'NVIDIA',
+        imageUrl: 'https://http2.mlstatic.com/D_NQ_NP_796258-MLB53002043396_122022-O.webp',
+        images: [
+            'https://http2.mlstatic.com/D_NQ_NP_796258-MLB53002043396_122022-O.webp',
+            'https://storage-asset.msi.com/global/picture/image/feature/vga/NVIDIA/RTX-4090-SUPRIM/RTX-4090-SUPRIM-24G/images2/design_1_1_n.png',
+        ],
         isActive: true,
         creationDate: new Date(),
         specs: {
@@ -503,8 +508,13 @@ const rawProducts: Omit<Product, 'priceList' | 'slug'>[] = [
         price: 1450000,
         stock: 4,
         category: 'Placas de video',
-        imageUrl: 'https://dlcdnwebimgs.asus.com/tuf-4080s.jpg',
-        images: ['https://dlcdnwebimgs.asus.com/tuf-4080s-1.jpg'],
+        subcategory: 'NVIDIA',
+        imageUrl:
+            'https://dinobyte.ar/wp-content/uploads/Vga-Asus-Tuf-Gaming-RTX-4080-SUPER-16GB-OC.jpg',
+        images: [
+            'https://dinobyte.ar/wp-content/uploads/Vga-Asus-Tuf-Gaming-RTX-4080-SUPER-16GB-OC.jpg',
+            'https://dlcdnwebimgs.asus.com/gain/CB46A2B7-E6F1-4F7F-B9A4-B8B4D38CCDE5/w500/h366',
+        ],
         isActive: true,
         creationDate: new Date(),
         specs: {
@@ -544,8 +554,12 @@ const rawProducts: Omit<Product, 'priceList' | 'slug'>[] = [
         price: 820000,
         stock: 7,
         category: 'Placas de video',
-        imageUrl: 'https://www.gigabyte.com/rtx4070-windforce.jpg',
-        images: ['https://www.gigabyte.com/rtx4070-windforce-1.jpg'],
+        subcategory: 'NVIDIA',
+        imageUrl: 'https://compucordoba.com.ar/img/Public/1078/50643-producto-4070-gigabyte.JPG',
+        images: [
+            'https://compucordoba.com.ar/img/Public/1078/50643-producto-4070-gigabyte.JPG',
+            'https://www.gigabyte.com/FileUpload/Global/KeyFeature/3225/images/01.jpg',
+        ],
         isActive: true,
         creationDate: new Date(),
         specs: {
@@ -583,8 +597,12 @@ const rawProducts: Omit<Product, 'priceList' | 'slug'>[] = [
         price: 990000,
         stock: 5,
         category: 'Placas de video',
-        imageUrl: 'https://www.zotac.com/rtx4070ti-trinity.jpg',
-        images: ['https://www.zotac.com/rtx4070ti-trinity-1.jpg'],
+        subcategory: 'NVIDIA',
+        imageUrl: 'https://m.media-amazon.com/images/I/61NsjwSmxML._AC_UF894,1000_QL80_.jpg',
+        images: [
+            'https://m.media-amazon.com/images/I/61NsjwSmxML._AC_UF894,1000_QL80_.jpg',
+            'https://bioscomputacion.com.ar/img/Public/1161/80520-producto-nb-placa-de-video-zotac-rtx-4070ti-super-16gb-trinity-black-ed-ver.jpg',
+        ],
         isActive: true,
         creationDate: new Date(),
         specs: {
@@ -627,8 +645,12 @@ const rawProducts: Omit<Product, 'priceList' | 'slug'>[] = [
         price: 1050000,
         stock: 6,
         category: 'Placas de video',
-        imageUrl: 'https://www.xfxforce.com/7900xt-merc.jpg',
-        images: ['https://www.xfxforce.com/7900xt-merc-1.jpg'],
+        subcategory: 'AMD Radeon',
+        imageUrl: 'https://http2.mlstatic.com/D_NQ_NP_856190-MLA91476253656_092025-O.webp',
+        images: [
+            'https://http2.mlstatic.com/D_NQ_NP_856190-MLA91476253656_092025-O.webp',
+            'https://www.xfxforce.com/media/catalog/product/r/x/rx-79tmercu9_2.png',
+        ],
         isActive: true,
         creationDate: new Date(),
         specs: {
@@ -666,8 +688,12 @@ const rawProducts: Omit<Product, 'priceList' | 'slug'>[] = [
         price: 750000,
         stock: 8,
         category: 'Placas de video',
-        imageUrl: 'https://www.sapphiretech.com/rx7800xt-pulse.jpg',
-        images: ['https://www.sapphiretech.com/rx7800xt-pulse-1.jpg'],
+        subcategory: 'AMD Radeon',
+        imageUrl: 'https://http2.mlstatic.com/D_NQ_NP_907972-MLA99937422139_112025-O.webp',
+        images: [
+            'https://http2.mlstatic.com/D_NQ_NP_907972-MLA99937422139_112025-O.webp',
+            'https://media.cdn.sapphiretech.com.cn/-/media/sites/sapphire/pim/product-images/11330_02_rx7800xt_pulse_16gddr6/rx7800xt_pulse_c07_r_light_374x265.ashx',
+        ],
         isActive: true,
         creationDate: new Date(),
         specs: {
@@ -705,8 +731,12 @@ const rawProducts: Omit<Product, 'priceList' | 'slug'>[] = [
         price: 620000,
         stock: 9,
         category: 'Placas de video',
-        imageUrl: 'https://www.powercolor.com/rx7700xt-fighter.jpg',
-        images: ['https://www.powercolor.com/rx7700xt-fighter-1.jpg'],
+        subcategory: 'AMD Radeon',
+        imageUrl: 'https://http2.mlstatic.com/D_NQ_NP_897745-MLA73949174075_012024-O.webp',
+        images: [
+            'https://http2.mlstatic.com/D_NQ_NP_897745-MLA73949174075_012024-O.webp',
+            'https://www.powercolor.com/upload/img_1694497694_2.png',
+        ],
         isActive: true,
         creationDate: new Date(),
         specs: {
@@ -744,8 +774,13 @@ const rawProducts: Omit<Product, 'priceList' | 'slug'>[] = [
         price: 520000,
         stock: 11,
         category: 'Placas de video',
-        imageUrl: 'https://www.asrock.com/rx7600xt-challenger.jpg',
-        images: ['https://www.asrock.com/rx7600xt-challenger-1.jpg'],
+        subcategory: 'AMD Radeon',
+        imageUrl:
+            'https://www.asrock.com/Graphics-Card/photo/Radeon%20RX%207600%20XT%20Challenger%2016GB%20OC(L1).png',
+        images: [
+            'https://www.asrock.com/Graphics-Card/photo/Radeon%20RX%207600%20XT%20Challenger%2016GB%20OC(L1).png',
+            'https://www.asrock.com/Graphics-Card/photo/Radeon%20RX%207600%20XT%20Challenger%2016GB%20OC(M1).png',
+        ],
         isActive: true,
         creationDate: new Date(),
         specs: {
@@ -787,8 +822,12 @@ const rawProducts: Omit<Product, 'priceList' | 'slug'>[] = [
         price: 820000,
         stock: 3,
         category: 'Procesadores',
-        imageUrl: 'https://www.amd.com/ryzen-9-7950x3d.jpg',
-        images: ['https://www.amd.com/ryzen-9-7950x3d-1.jpg'],
+        subcategory: 'AMD',
+        imageUrl: 'https://http2.mlstatic.com/D_Q_NP_2X_629040-MLA91585835583_092025-P.webp',
+        images: [
+            'https://http2.mlstatic.com/D_Q_NP_2X_629040-MLA91585835583_092025-P.webp',
+            'https://www.amd.com/content/dam/amd/en/images/products/processors/ryzen/2977942-ryzen-9-7950x3d-tray-1260x709.png',
+        ],
         isActive: true,
         creationDate: new Date(),
         specs: {
@@ -814,8 +853,13 @@ const rawProducts: Omit<Product, 'priceList' | 'slug'>[] = [
         price: 400000,
         stock: 9,
         category: 'Procesadores',
-        imageUrl: 'https://www.amd.com/ryzen-7-7700x.jpg',
-        images: ['https://www.amd.com/ryzen-7-7700x-1.jpg'],
+        subcategory: 'AMD',
+        imageUrl:
+            'https://www.amd.com/content/dam/amd/en/images/products/processors/ryzen/2505503-ryzen-7-7700x.jpg',
+        images: [
+            'https://www.amd.com/content/dam/amd/en/images/products/processors/ryzen/2505503-ryzen-7-7700x.jpg',
+            'https://statics.qloud.ar/m-y-m-computacion-06-2020/0000000000000730143314428_4.jpg',
+        ],
         isActive: true,
         creationDate: new Date(),
         specs: {
@@ -846,8 +890,13 @@ const rawProducts: Omit<Product, 'priceList' | 'slug'>[] = [
         price: 550000,
         stock: 6,
         category: 'Procesadores',
-        imageUrl: 'https://www.intel.com/core-i7-14700k.jpg',
-        images: ['https://www.intel.com/core-i7-14700k-1.jpg'],
+        subcategory: 'Intel',
+        imageUrl:
+            'https://fullh4rd.com.ar/img/productos/1/micro-intel-core-i7-14700k-cvideo-scooler-s1700-0.jpg',
+        images: [
+            'https://fullh4rd.com.ar/img/productos/1/micro-intel-core-i7-14700k-cvideo-scooler-s1700-0.jpg',
+            'https://www.intel.com/content/dam/www/public/us/en/images/photography-consumer/rwd/processors/core-i7-14700k-processor-rwd.png',
+        ],
         isActive: true,
         creationDate: new Date(),
         specs: {
@@ -873,8 +922,13 @@ const rawProducts: Omit<Product, 'priceList' | 'slug'>[] = [
         price: 750000,
         stock: 4,
         category: 'Procesadores',
-        imageUrl: 'https://www.intel.com/core-i9-14900k.jpg',
-        images: ['https://www.intel.com/core-i9-14900k-1.jpg'],
+        subcategory: 'Intel',
+        imageUrl:
+            'https://mexx-img-2019.s3.amazonaws.com/Procesador-Intel-Core-i9-14900K-6-Ghz-Raptor-Lake-1700-Sin-Cooler_47082_1.jpeg',
+        images: [
+            'https://mexx-img-2019.s3.amazonaws.com/Procesador-Intel-Core-i9-14900K-6-Ghz-Raptor-Lake-1700-Sin-Cooler_47082_1.jpeg',
+            'https://www.intel.com/content/dam/www/public/us/en/images/photography-consumer/rwd/processors/core-i9-14900k-processor-rwd.png',
+        ],
         isActive: true,
         creationDate: new Date(),
         specs: {
