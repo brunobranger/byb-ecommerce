@@ -11,6 +11,10 @@ import OrderConfirmation from '../components/OrderConfirmation'
 import { shippingCarriers } from '../data/shippingCarriers'
 import { calculateSubtotal } from '../utils/priceUtils'
 import type { PaymentMethodId } from '../types/paymentMethod'
+import { orderService } from '../services/orderService'
+
+import { useAuth } from '../context/AuthContext'
+import { useNavigate } from 'react-router'
 
 type Step = 'cart' | 'shipping' | 'payment' | 'credit_card' | 'billing' | 'confirmation'
 type ShippingOption = 'pickup' | 'delivery' | null
@@ -45,7 +49,11 @@ const userAddress = {
 }
 
 const CartScreen = () => {
-    const { cartItems } = useCart()
+    const { cartItems, clearCart } = useCart()
+
+    const { isAuthenticated } = useAuth()
+    const navigate = useNavigate()
+
     const [searchParams, setSearchParams] = useSearchParams()
     const [shippingOption, setShippingOption] = useState<ShippingOption>(null)
     const [selectedCarrier, setSelectedCarrier] = useState<string | null>(null)
@@ -53,7 +61,7 @@ const CartScreen = () => {
     const [cardValid, setCardValid] = useState(false)
     const [installmentDelta, setInstallmentDelta] = useState(0) // Delta de la cuota elegida — negativo, cero o positivo, siempre sobre priceList
     const [orderSuccess, setOrderSuccess] = useState<boolean | null>(null)
-    const [orderNumber] = useState(`ORD-${Math.floor(100000 + Math.random() * 900000)}`) // Número de orden simulado
+    const [orderNumber, setOrderNumber] = useState('') // Número de orden simulado
     const rawStep = searchParams.get('step') as Step | null
     const step: Step = rawStep && VALID_STEPS.includes(rawStep) ? rawStep : 'cart' // Leemos el step desde la URL — si no existe o no es válido, usamos 'cart'
 
@@ -146,17 +154,38 @@ const CartScreen = () => {
     }
 
     const handleNext = () => {
-        if (step === 'cart') setStep('shipping')
+        if (step === 'cart') {
+            if (!isAuthenticated) {
+                navigate('/ingresar', { state: { from: '/carrito' } })
+                return
+            }
+            setStep('shipping')
+        }
         if (step === 'shipping') setStep('payment')
         if (step === 'payment')
             selectedPayment === 'credit_card' ? setStep('credit_card') : setStep('billing')
         if (step === 'credit_card') setStep('billing')
     }
 
-    const handleConfirmOrder = () => {
-        // Simulamos resultado — a futuro se conecta a la API
-        setOrderSuccess(true)
-        setStep('confirmation')
+    const handleConfirmOrder = async () => {
+        try {
+            const order = await orderService.createOrder({
+                shippingOption: shippingOption!,
+                carrier: selectedCarrier ?? undefined,
+                shippingCost: shippingCost ?? 0,
+                deliveryAddress: shippingOption === 'delivery' ? userAddress : undefined,
+                paymentMethod: selectedPayment!,
+                subtotal,
+                total,
+            })
+            await clearCart()
+            setOrderNumber(order.orderNumber)
+            setOrderSuccess(true)
+            setStep('confirmation')
+        } catch (error) {
+            setOrderSuccess(false)
+            setStep('confirmation')
+        }
     }
 
     const selectedCarrierObj = shippingCarriers.find(c => c.id === selectedCarrier) ?? null
