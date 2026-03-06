@@ -1,4 +1,11 @@
-import type { AllProductSpecs, CPUSpecs, GPUSpecs, RAMSpecs, PSUSpecs } from '../types/specs'
+import type {
+    AllProductSpecs,
+    CPUSpecs,
+    GPUSpecs,
+    RAMSpecs,
+    PSUSpecs,
+    SSDSpecs,
+} from '../types/specs'
 
 export const PRICE_LIST_MODIFIER = 1.2
 
@@ -128,7 +135,7 @@ export const rawProducts: RawProduct[] = [
         subcategory: 'AMD',
         imageUrl: 'https://i.ebayimg.com/images/g/F9UAAOSw~Ytlb3hN/s-l1600.jpg',
         images: [
-            'https://www.amd.com/content/dam/amd/en/images/products/processors/ryzen/2529436-ryzen-5-7600x-PIB-left-facing-1260x709.png',
+            'https://i.ebayimg.com/images/g/F9UAAOSw~Ytlb3hN/s-l1600.jpg',
             'https://www.amd.com/content/dam/amd/en/images/products/processors/ryzen/2529436-ryzen-5-7600x-tray-1260x709.png',
         ],
         isActive: true,
@@ -960,5 +967,31 @@ export const rawProducts: RawProduct[] = [
             l2: '32 MB',
             l3: '36 MB',
         } as CPUSpecs,
+    },
+    {
+        id: '18',
+        name: 'SSD Samsung 870 EVO 1TB SATA III 2.5"',
+        price: 95000,
+        stock: 18,
+        category: 'Almacenamiento',
+        subcategory: 'SSD SATA',
+        imageUrl: 'https://www.megatone.net/images/Articulos/69/389/56/zoom2x/MKT2056LQA-1.webp',
+        images: ['https://www.megatone.net/images/Articulos/69/389/56/zoom2x/MKT2056LQA-1.webp'],
+        isActive: true,
+        creationDate: new Date(),
+        specs: {
+            brand: 'Samsung',
+            model: '870 EVO',
+            capacity: 1000, // GB
+            interface: 'SATA III 6Gb/s',
+            formFactor: '2.5"',
+            readSpeed: 560, // MB/s
+            writeSpeed: 530, // MB/s
+            nandType: 'V-NAND 3-bit MLC (TLC)',
+            controller: 'Samsung MKX',
+            cache: '1GB LPDDR4',
+            tbw: '600 TBW',
+            warranty: '5 años',
+        } as SSDSpecs,
     },
 ]
