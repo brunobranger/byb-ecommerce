@@ -1,18 +1,17 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams, useSearchParams } from 'react-router'
-import sampleProducts from '../data/products'
 import ProductCard from './ProductCard'
 import type { Product } from '../types/product'
 import CustomDropdown from './CustomDropdown'
 import { CATEGORY_DATA } from '../types/category'
 import { Link } from 'react-router'
+import { productService } from '../services/productService'
 
 const formatSlug = (text: string) => text.toLowerCase().replace(/\s+/g, '-')
 
-// ─── Sidebar acordeón para /productos ────────────────────────────────────────
+// ─── Sidebar para /productos ────
 
-const CategoryAccordion = () => {
-    // Todas las categorías expandidas por defecto — se puede cambiar a []
+const CategorySidebar = () => {
     const [expanded, setExpanded] = useState<Set<string>>(new Set(CATEGORY_DATA.map(c => c.name)))
 
     const toggle = (name: string) => {
@@ -36,7 +35,6 @@ const CategoryAccordion = () => {
 
                 return (
                     <li key={category.name}>
-                        {/* Fila de categoría */}
                         <div className="flex items-center justify-between group">
                             <Link
                                 to={`/categoria/${slug}`}
@@ -68,7 +66,6 @@ const CategoryAccordion = () => {
                             )}
                         </div>
 
-                        {/* Subcategorías */}
                         {hasItems && isOpen && (
                             <ul className="mb-1 border-l border-gray-200 ml-1 pl-3 space-y-0">
                                 {category.items.map(subItem => (
@@ -90,39 +87,36 @@ const CategoryAccordion = () => {
     )
 }
 
-// ─── Componente principal ─────────────────────────────────────────────────────
+// ─── Componente principal ────
 
 const ProductsSection = () => {
     const { categorySlug, subcategorySlug, slug } = useParams()
     const [searchParams] = useSearchParams()
-    const searchQuery = searchParams.get('search')?.toLowerCase() || ''
+    const searchQuery = searchParams.get('search') || ''
+
+    const [products, setProducts] = useState<Product[]>([])
+    const [loading, setLoading] = useState(true)
 
     const activeSlug = categorySlug ?? slug
 
     const currentCategory = CATEGORY_DATA.find(cat => formatSlug(cat.name) === activeSlug)
-
     const currentSubcategory = subcategorySlug
         ? currentCategory?.items.find(item => formatSlug(item) === subcategorySlug)
         : undefined
 
-    const filteredProducts = sampleProducts.filter((product: Product) => {
-        if (searchQuery) {
-            const matchesSearch =
-                product.name.toLowerCase().includes(searchQuery) ||
-                product.category.toLowerCase().includes(searchQuery)
-            if (!matchesSearch) return false
-        }
-
-        if (currentCategory) {
-            if (product.category !== currentCategory.name) return false
-        }
-
-        if (currentSubcategory) {
-            if (product.subcategory !== currentSubcategory) return false
-        }
-
-        return true
-    })
+    // Fetch al backend — se re-ejecuta cuando cambia categoría, subcategoría o búsqueda
+    useEffect(() => {
+        setLoading(true)
+        productService
+            .getAll({
+                category: currentCategory?.name,
+                subcategory: currentSubcategory,
+                search: searchQuery || undefined,
+            })
+            .then(setProducts)
+            .catch(() => setProducts([]))
+            .finally(() => setLoading(false))
+    }, [currentCategory?.name, currentSubcategory, searchQuery])
 
     const pageTitle = searchQuery
         ? `Resultados: ${searchQuery}`
@@ -162,7 +156,7 @@ const ProductsSection = () => {
                             )}
                             {searchQuery && (
                                 <p className="text-sm text-gray-400">
-                                    Mostrando {filteredProducts.length} resultados
+                                    Mostrando {products.length} resultados
                                 </p>
                             )}
                         </div>
@@ -218,7 +212,7 @@ const ProductsSection = () => {
                             ) : (
                                 // MODO GENERAL — acordeón con subcategorías
                                 <li className="list-none">
-                                    <CategoryAccordion />
+                                    <CategorySidebar />
                                 </li>
                             )}
                         </ul>
@@ -226,9 +220,13 @@ const ProductsSection = () => {
 
                     {/* Grid de productos */}
                     <div className="flex-1">
-                        {filteredProducts.length > 0 ? (
+                        {loading ? (
+                            <div className="py-20 text-center">
+                                <p className="text-gray-400 font-medium">Cargando productos...</p>
+                            </div>
+                        ) : products.length > 0 ? (
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                                {filteredProducts.map((product: Product) => (
+                                {products.map((product: Product) => (
                                     <ProductCard key={product.id} product={product} />
                                 ))}
                             </div>

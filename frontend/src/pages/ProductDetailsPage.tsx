@@ -1,12 +1,32 @@
+import { useEffect, useState } from 'react'
 import { useParams } from 'react-router'
-import sampleProducts from '../data/products'
+import { productService } from '../services/productService'
 import ProductDetails from '../components/ProductDetails'
+import type { Product } from '../types/product'
 
 const ProductDetailsPage = () => {
     const { slug } = useParams()
-    const product = sampleProducts.find(p => p.slug === slug)
+    const [product, setProduct] = useState<Product | null>(null)
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState(false)
 
-    if (!product)
+    useEffect(() => {
+        if (!slug) return
+        productService
+            .getBySlug(slug)
+            .then(setProduct)
+            .catch(() => setError(true))
+            .finally(() => setLoading(false))
+    }, [slug])
+
+    if (loading)
+        return (
+            <div className="min-h-screen bg-white flex items-center justify-center text-black">
+                Cargando...
+            </div>
+        )
+
+    if (error || !product)
         return (
             <div className="min-h-screen bg-white flex items-center justify-center text-black">
                 Producto no encontrado
