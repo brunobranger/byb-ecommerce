@@ -1,14 +1,10 @@
+import type { User } from '../types/user'
+
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api'
 
 export interface AuthResponse {
     token: string
-    user: {
-        id: string
-        clientNumber: string
-        fullName: string
-        email: string
-        role: 'user' | 'admin'
-    }
+    user: User
 }
 
 export const authService = {
@@ -18,12 +14,10 @@ export const authService = {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password }),
         })
-
         if (!res.ok) {
             const data = (await res.json()) as { message: string }
             throw new Error(data.message)
         }
-
         return res.json()
     },
 
@@ -33,22 +27,18 @@ export const authService = {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ fullName, email, password }),
         })
-
         if (!res.ok) {
             const data = (await res.json()) as { message: string }
             throw new Error(data.message)
         }
-
         return res.json()
     },
 
-    me: async (token: string): Promise<AuthResponse['user']> => {
+    me: async (token: string): Promise<User> => {
         const res = await fetch(`${API_URL}/auth/me`, {
             headers: { Authorization: `Bearer ${token}` },
         })
-
         if (!res.ok) throw new Error('Session expired')
-
         return res.json()
     },
 }

@@ -1,4 +1,11 @@
-export type AllProductSpecs = CPUSpecs | GPUSpecs | RAMSpecs | PSUSpecs | CASESpecs | MonitorSpecs
+export type AllProductSpecs =
+    | CPUSpecs
+    | GPUSpecs
+    | RAMSpecs
+    | PSUSpecs
+    | CASESpecs
+    | MonitorSpecs
+    | SSDSpecs
 
 export type CPUSpecs = {
     // General
@@ -169,4 +176,14 @@ export type MonitorSpecs = {
     touchDisplay: number
     nvidiaGsync?: boolean
     amdFreesync?: boolean
+}
+
+export type SSDSpecs = {
+    brand: string
+    model: string
+    capacity: number
+    interface: string
+    formFactor: string
+    readSpeed: number
+    writeSpeed: number
 }

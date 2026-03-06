@@ -1,10 +1,13 @@
 import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
-import { useNavigate } from 'react-router'
+import { useNavigate, useLocation } from 'react-router'
 
 const Auth = () => {
     const { login, register, loading: authLoading } = useAuth()
     const navigate = useNavigate()
+
+    const location = useLocation()
+    const from = (location.state as { from?: string })?.from ?? '/perfil'
 
     const [isLogin, setIsLogin] = useState(true)
     const [showPassword, setShowPassword] = useState(false)
@@ -31,7 +34,7 @@ const Auth = () => {
                 } else {
                     await register(fullName, email, password)
                 }
-                navigate('/perfil')
+                navigate(from)
             } catch (error) {
                 console.log('Error:', error)
                 setServerError(error instanceof Error ? error.message : 'Error inesperado')
