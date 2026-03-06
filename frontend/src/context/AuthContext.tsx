@@ -5,7 +5,7 @@ import { authService } from '../services/authService'
 
 interface AuthContextType {
     user: User | null
-    login: (email: string, pass: string) => Promise<void>
+    login: (email: string, password: string) => Promise<void>
     register: (fullName: string, email: string, password: string) => Promise<void>
     logout: () => void
     isAuthenticated: boolean
@@ -28,7 +28,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         authService
             .me(token)
-            .then(userData => setUser(userData as User))
+            .then(userData => setUser(userData))
             .catch(() => localStorage.removeItem('app_token'))
             .finally(() => setLoading(false))
     }, [])
@@ -36,9 +36,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const login = async (email: string, password: string) => {
         setLoading(true)
         try {
-            const { token, user } = await authService.login(email, password)
+            const { token } = await authService.login(email, password)
             localStorage.setItem('app_token', token)
-            setUser(user as User)
+            // Traemos el usuario completo desde /me
+            const freshUser = await authService.me(token)
+            setUser(freshUser)
         } catch (error) {
             throw error
         } finally {
@@ -49,9 +51,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const register = async (fullName: string, email: string, password: string): Promise<void> => {
         setLoading(true)
         try {
-            const { token, user } = await authService.register(fullName, email, password)
+            const { token } = await authService.register(fullName, email, password)
             localStorage.setItem('app_token', token)
-            setUser(user as User)
+            // Igual que en login, traemos el usuario completo desde /me
+            const freshUser = await authService.me(token)
+            setUser(freshUser)
         } catch (error) {
             throw error
         } finally {
@@ -62,7 +66,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const logout = () => {
         // Al setear en null, todos los componentes (Navbar, etc)
         // que usen useAuth se actualizan de manera automatica (o sea, el nav que dice "Mi cuenta" o "Ingresar")
-        localStorage.removeItem('app_user')
+        localStorage.removeItem('app_token')
         setUser(null)
     }
 
