@@ -2,19 +2,30 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router'
 import { useAuth } from '../context/AuthContext'
 import { userService } from '../services/userService'
+import { orderService } from '../services/orderService'
 import type { User } from '../types/user'
-
-// Tipos
 
 type Section = 'personal-info' | 'order-history' | 'addresses'
 
-// Mock data: Compras y direcciones
+interface OrderItem {
+    name: string
+    quantity: number
+    price: number
+    imageUrl?: string
+}
 
-const mockOrders = [
-    { id: 'ORD-482910', date: '14 ene 2025', status: 'Entregado', total: 89500, items: 3 },
-    { id: 'ORD-371204', date: '02 dic 2024', status: 'En camino', total: 142000, items: 1 },
-    { id: 'ORD-290031', date: '18 nov 2024', status: 'Entregado', total: 54300, items: 2 },
-]
+interface Order {
+    _id: string
+    orderNumber: string
+    createdAt: string
+    status: 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled'
+    total: number
+    items: OrderItem[]
+    paymentMethod: string
+    shippingOption: 'pickup' | 'delivery'
+    carrier?: string
+    shippingCost: number
+}
 
 const mockAddresses = [
     {
@@ -28,19 +39,29 @@ const mockAddresses = [
     },
 ]
 
-// Helpers
-
 const statusColors: Record<string, string> = {
-    Entregado: 'bg-green-100 text-green-700',
-    'En camino': 'bg-blue-100 text-blue-700',
-    Cancelado: 'bg-red-100 text-red-700',
-    Pendiente: 'bg-yellow-100 text-yellow-700',
+    pending: 'bg-yellow-100 text-yellow-700',
+    confirmed: 'bg-blue-100 text-blue-700',
+    shipped: 'bg-purple-100 text-purple-700',
+    delivered: 'bg-green-100 text-green-700',
+    cancelled: 'bg-red-100 text-red-700',
+}
+
+const statusLabels: Record<string, string> = {
+    pending: 'Pendiente',
+    confirmed: 'Confirmado',
+    shipped: 'En camino',
+    delivered: 'Entregado',
+    cancelled: 'Cancelado',
 }
 
 const formatPrice = (n: number) =>
     n.toLocaleString('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 })
 
-//  Sub-secciones
+const formatDate = (iso: string) =>
+    new Date(iso).toLocaleDateString('es-AR', { day: '2-digit', month: 'short', year: 'numeric' })
+
+// ─── PersonalInfo (sin cambios) ───
 
 const PersonalInfo = ({ user }: { user: User }) => {
     const [editingPersonal, setEditingPersonal] = useState(false)
@@ -97,7 +118,6 @@ const PersonalInfo = ({ user }: { user: User }) => {
         <div className="space-y-8">
             {saveError && <p className="text-sm text-red-500 font-medium">{saveError}</p>}
 
-            {/* Datos Personales */}
             <section className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
                 <div className="flex items-center justify-between mb-6">
                     <h3 className="text-lg font-bold tracking-tight">Datos Personales</h3>
@@ -130,7 +150,6 @@ const PersonalInfo = ({ user }: { user: User }) => {
                 )}
             </section>
 
-            {/* Datos de Facturación */}
             <section className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
                 <div className="flex items-center justify-between mb-6">
                     <h3 className="text-lg font-bold tracking-tight">Datos de Facturación</h3>
@@ -162,36 +181,133 @@ const PersonalInfo = ({ user }: { user: User }) => {
     )
 }
 
-const OrderHistory = () => (
-    <div className="space-y-4">
-        {mockOrders.map(order => (
-            <div
-                key={order.id}
-                className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm flex justify-between items-center"
-            >
-                <div className="flex-1 space-y-1">
-                    <div className="flex items-center gap-3">
-                        <span className="font-bold text-sm">{order.id}</span>
-                        <span
-                            className={`text-xs font-semibold px-2 py-0.5 rounded-full ${statusColors[order.status]}`}
-                        >
-                            {order.status}
-                        </span>
-                    </div>
-                    <p className="text-xs text-gray-500">
-                        {order.date} · {order.items} productos
-                    </p>
-                </div>
-                <div className="flex items-center gap-4">
-                    <span className="font-bold text-gray-900">{formatPrice(order.total)}</span>
-                    <button className="text-sm text-blue-600 font-medium transition-colors">
-                        Ver detalle
-                    </button>
-                </div>
+// ─── OrderHistory — ahora con datos reales ───
+
+const OrderHistory = () => {
+    const [orders, setOrders] = useState<Order[]>([])
+    const [loading, setLoading] = useState(true)
+    const [expandedId, setExpandedId] = useState<string | null>(null)
+
+    useEffect(() => {
+        orderService
+            .getMyOrders()
+            .then(setOrders)
+            .catch(() => setOrders([]))
+            .finally(() => setLoading(false))
+    }, [])
+
+    if (loading) return <p className="text-sm text-gray-400">Cargando órdenes...</p>
+
+    if (orders.length === 0)
+        return (
+            <div className="py-20 text-center border-2 border-dashed border-gray-200 rounded-xl">
+                <p className="text-gray-500 font-medium">Todavía no realizaste ninguna compra.</p>
             </div>
-        ))}
-    </div>
-)
+        )
+
+    return (
+        <div className="space-y-4">
+            {orders.map(order => (
+                <div
+                    key={order._id}
+                    className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden"
+                >
+                    {/* Fila principal */}
+                    <div className="p-5 flex justify-between items-center">
+                        <div className="flex-1 space-y-1">
+                            <div className="flex items-center gap-3">
+                                <span className="font-bold text-sm">{order.orderNumber}</span>
+                                <span
+                                    className={`text-xs font-semibold px-2 py-0.5 rounded-full ${statusColors[order.status]}`}
+                                >
+                                    {statusLabels[order.status]}
+                                </span>
+                            </div>
+                            <p className="text-xs text-gray-500">
+                                {formatDate(order.createdAt)} · {order.items.length}{' '}
+                                {order.items.length === 1 ? 'producto' : 'productos'}
+                            </p>
+                        </div>
+                        <div className="flex items-center gap-4">
+                            <span className="font-bold text-gray-900">
+                                {formatPrice(order.total)}
+                            </span>
+                            <button
+                                onClick={() =>
+                                    setExpandedId(prev => (prev === order._id ? null : order._id))
+                                }
+                                className="text-sm text-blue-600 font-medium hover:text-blue-500 transition-colors"
+                            >
+                                {expandedId === order._id ? 'Ocultar' : 'Ver detalle'}
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Detalle expandible */}
+                    {expandedId === order._id && (
+                        <div className="border-t border-gray-100 px-5 pb-5 pt-4 space-y-4">
+                            {/* Productos */}
+                            <div className="space-y-3">
+                                {order.items.map((item, i) => (
+                                    <div key={i} className="flex items-center gap-3">
+                                        {item.imageUrl && (
+                                            <img
+                                                src={item.imageUrl}
+                                                alt={item.name}
+                                                className="w-12 h-12 object-contain rounded-lg bg-gray-50 border border-gray-100"
+                                            />
+                                        )}
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-sm font-medium text-gray-900 truncate">
+                                                {item.name}
+                                            </p>
+                                            <p className="text-xs text-gray-500">
+                                                x{item.quantity} · {formatPrice(item.price)} c/u
+                                            </p>
+                                        </div>
+                                        <span className="text-sm font-semibold text-gray-800">
+                                            {formatPrice(item.price * item.quantity)}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Resumen */}
+                            <div className="border-t border-gray-100 pt-3 grid grid-cols-2 gap-2 text-xs text-gray-500">
+                                <span>
+                                    Envío:{' '}
+                                    {order.shippingOption === 'pickup'
+                                        ? 'Retiro en local'
+                                        : (order.carrier ?? 'A domicilio')}
+                                </span>
+                                <span>
+                                    Pago:{' '}
+                                    {{
+                                        cash: 'Efectivo',
+                                        bank_deposit: 'Transferencia / Depósito',
+                                        credit_card: 'Tarjeta de crédito',
+                                        mercado_pago: 'Mercado Pago',
+                                    }[order.paymentMethod] ?? order.paymentMethod}
+                                </span>
+                                <span>
+                                    Subtotal: {formatPrice(order.total - order.shippingCost)}
+                                </span>
+                                <span>
+                                    Envío:{' '}
+                                    {order.shippingCost === 0
+                                        ? 'Gratis'
+                                        : formatPrice(order.shippingCost)}
+                                </span>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            ))}
+        </div>
+    )
+}
+
+// ─── MyAddresses (sin cambios por ahora) ───
 
 const MyAddresses = () => (
     <div className="space-y-4">
@@ -219,7 +335,7 @@ const MyAddresses = () => (
     </div>
 )
 
-// Componente Principal
+// ─── Componente Principal ───
 
 const UserProfile = () => {
     const { user, logout } = useAuth()
@@ -231,7 +347,6 @@ const UserProfile = () => {
         navigate('/ingresar')
     }
 
-    // Si el usuario se desloguea, desaparece el componente
     if (!user) return null
 
     return (
@@ -242,24 +357,25 @@ const UserProfile = () => {
                         Mi Cuenta
                     </h2>
                     <nav className="flex flex-col gap-2">
-                        <button
-                            onClick={() => setActiveSection('personal-info')}
-                            className={`text-left px-4 py-3 rounded-xl text-sm font-bold transition-colors ${activeSection === 'personal-info' ? 'bg-blue-50 text-blue-600' : 'text-gray-500 hover:bg-gray-50'}`}
-                        >
-                            Mis datos
-                        </button>
-                        <button
-                            onClick={() => setActiveSection('order-history')}
-                            className={`text-left px-4 py-3 rounded-xl text-sm font-bold transition-colors ${activeSection === 'order-history' ? 'bg-blue-50 text-blue-600' : 'text-gray-500 hover:bg-gray-50'}`}
-                        >
-                            Mis compras
-                        </button>
-                        <button
-                            onClick={() => setActiveSection('addresses')}
-                            className={`text-left px-4 py-3 rounded-xl text-sm font-bold transition-colors ${activeSection === 'addresses' ? 'bg-blue-50 text-blue-600' : 'text-gray-500 hover:bg-gray-50'}`}
-                        >
-                            Mis direcciones
-                        </button>
+                        {(
+                            [
+                                { id: 'personal-info', label: 'Mis datos' },
+                                { id: 'order-history', label: 'Mis compras' },
+                                { id: 'addresses', label: 'Mis direcciones' },
+                            ] as { id: Section; label: string }[]
+                        ).map(({ id, label }) => (
+                            <button
+                                key={id}
+                                onClick={() => setActiveSection(id)}
+                                className={`text-left px-4 py-3 rounded-xl text-sm font-bold transition-colors ${
+                                    activeSection === id
+                                        ? 'bg-blue-50 text-blue-600'
+                                        : 'text-gray-500 hover:bg-gray-50'
+                                }`}
+                            >
+                                {label}
+                            </button>
+                        ))}
                         <button
                             onClick={handleLogout}
                             className="text-left px-4 py-3 rounded-xl text-sm font-bold text-red-500 hover:bg-red-50 transition-colors mt-4"
