@@ -1,4 +1,4 @@
-// scripts/seedProducts.ts
+// scripts/insertProducts.ts
 import mongoose from 'mongoose'
 import dotenv from 'dotenv'
 import Product from '../models/Product'
