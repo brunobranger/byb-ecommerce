@@ -19,7 +19,6 @@ import { useNavigate } from 'react-router'
 type Step = 'cart' | 'shipping' | 'payment' | 'credit_card' | 'billing' | 'confirmation'
 type ShippingOption = 'pickup' | 'delivery' | null
 
-// Steps válidos — para validar que nadie entre con un ?step=cualquiercosa en la URL
 const VALID_STEPS: Step[] = [
     'cart',
     'shipping',
@@ -29,7 +28,6 @@ const VALID_STEPS: Step[] = [
     'confirmation',
 ]
 
-// Orden de los pasos para realizar el proceso de compra (y para modificar la URL en base a eso)
 const STEP_ORDER: Record<Step, number> = {
     cart: 0,
     shipping: 1,
@@ -39,7 +37,6 @@ const STEP_ORDER: Record<Step, number> = {
     confirmation: 5,
 }
 
-// Dirección del usuario (vendría del perfil/cuenta)
 const userAddress = {
     street: 'Av. Santa Fe 3456 2°B',
     city: 'Palermo - Buenos Aires',
@@ -59,16 +56,14 @@ const CartScreen = () => {
     const [selectedCarrier, setSelectedCarrier] = useState<string | null>(null)
     const [selectedPayment, setSelectedPayment] = useState<PaymentMethodId | null>(null)
     const [cardValid, setCardValid] = useState(false)
-    const [installmentDelta, setInstallmentDelta] = useState(0) // Delta de la cuota elegida — negativo, cero o positivo, siempre sobre priceList
+    const [installmentDelta, setInstallmentDelta] = useState(0)
     const [orderSuccess, setOrderSuccess] = useState<boolean | null>(null)
-    const [orderNumber, setOrderNumber] = useState('') // Número de orden simulado
+    const [orderNumber, setOrderNumber] = useState('')
     const rawStep = searchParams.get('step') as Step | null
-    const step: Step = rawStep && VALID_STEPS.includes(rawStep) ? rawStep : 'cart' // Leemos el step desde la URL — si no existe o no es válido, usamos 'cart'
+    const step: Step = rawStep && VALID_STEPS.includes(rawStep) ? rawStep : 'cart'
 
-    // Funcion para cambiar el step — actualiza la URL en lugar del estado
     const setStep = (nextStep: Step) => {
         if (nextStep === 'cart') {
-            // En cart limpiamos el query param para tener la URL más limpia: /carrito
             setSearchParams({})
         } else {
             setSearchParams({ step: nextStep })
@@ -79,8 +74,11 @@ const CartScreen = () => {
 
     // Guards — evitan que el usuario llegue a un step sin haber completado los anteriores
     useEffect(() => {
-        // Si el carrito está vacío no puede estar en ningún step avanzado
-        if (isEmpty && step !== 'cart') {
+        // Si el carrito está vacío no puede estar en ningún step avanzado (excepto confirmation)
+        // La excepción de orderSuccess !== null cubre el caso donde el carrito se vació
+        // justo después de confirmar la orden — sin esto, el guard redirige a 'cart' antes
+        // de que el step 'confirmation' se estabilice en el render
+        if (isEmpty && step !== 'cart' && step !== 'confirmation' && orderSuccess === null) {
             setStep('cart')
             return
         }
@@ -110,7 +108,6 @@ const CartScreen = () => {
         }
     }, [step, isEmpty, shippingOption, selectedPayment, orderSuccess])
 
-    // Calculamos el costo de envío según el carrier seleccionado
     const shippingCost =
         shippingOption === 'delivery'
             ? (shippingCarriers.find(c => c.id === selectedCarrier)?.price ?? null)
@@ -118,7 +115,6 @@ const CartScreen = () => {
               ? 0
               : null
 
-    // Subtotal y total — lo deje en priceUtils para evitar lógica duplicada o acumulativa
     const subtotal = calculateSubtotal(cartItems, selectedPayment, installmentDelta)
     const total = subtotal + (shippingCost ?? 0)
 
@@ -178,10 +174,10 @@ const CartScreen = () => {
                 subtotal,
                 total,
             })
-            await clearCart()
             setOrderNumber(order.orderNumber)
             setOrderSuccess(true)
             setStep('confirmation')
+            await clearCart()
         } catch (error) {
             setOrderSuccess(false)
             setStep('confirmation')
@@ -242,7 +238,11 @@ const CartScreen = () => {
             <hr className="opacity-20 mb-8 border-black" />
 
             {/* Carrito */}
-            {isEmpty ? (
+            {/* 
+                La condición incluye orderSuccess === null para evitar mostrar el carrito vacío
+                cuando el usuario acaba de confirmar una orden y el carrito todavía se está limpiando
+            */}
+            {isEmpty && orderSuccess === null ? (
                 /* Carrito Vacío */
                 <div className="min-h-[50vh] flex items-center justify-center flex-col">
                     <svg

@@ -27,13 +27,32 @@ const successMessages: Record<PaymentMethodId, { title: string; body: string }> 
     },
 }
 
+const errorMessages: Record<PaymentMethodId, { title: string; body: string }> = {
+    cash: {
+        title: 'Hubo un problema',
+        body: 'No pudimos procesar tu pedido. Por favor, intentá nuevamente o contactanos para ayuda.',
+    },
+    bank_deposit: {
+        title: 'Hubo un problema',
+        body: 'No pudimos procesar tu pedido. Por favor, intentá nuevamente o contactanos para ayuda.',
+    },
+    credit_card: {
+        title: 'Hubo un problema',
+        body: 'No pudimos procesar tu pago. Verificá los datos de tu tarjeta e intentá nuevamente.',
+    },
+    mercado_pago: {
+        title: 'Hubo un problema',
+        body: 'No pudimos procesar tu pago a través de Mercado Pago. Por favor, intentá nuevamente.',
+    },
+}
+
 const OrderConfirmation = ({
     success,
     paymentMethod,
     orderNumber,
     onRetry,
 }: OrderConfirmationProps) => {
-    const message = successMessages[paymentMethod]
+    const message = success ? successMessages[paymentMethod] : errorMessages[paymentMethod]
 
     return (
         <div className="min-h-[50vh] flex flex-col items-center justify-center text-center gap-6 py-12">
