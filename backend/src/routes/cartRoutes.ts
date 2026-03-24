@@ -4,7 +4,7 @@ import { authMiddleware } from '../middleware/auth'
 
 const router = Router()
 
-// Todas las rutas del carrito requieren autenticación
+// Todas las rutas del carrito requieren auth
 router.use(authMiddleware)
 
 router.get('/', getCart)
