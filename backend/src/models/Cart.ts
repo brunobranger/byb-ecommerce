@@ -27,7 +27,7 @@ const CartItemSchema = new Schema<ICartItem>({
     priceList: { type: Number, required: true },
     quantity: { type: Number, required: true, min: 1 },
     stock: { type: Number, required: true },
-    category: { type: String, required: true }, // ← agregar
+    category: { type: String, required: true },
 })
 
 const CartSchema = new Schema<ICart>(
