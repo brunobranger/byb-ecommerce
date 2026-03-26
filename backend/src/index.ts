@@ -9,6 +9,7 @@ import authRoutes from './routes/authRoutes'
 import userRoutes from './routes/userRoutes'
 import cartRoutes from './routes/cartRoutes'
 import orderRoutes from './routes/orderRoutes'
+import paymentRoutes from './routes/paymentRoutes'
 
 dotenv.config()
 
@@ -29,6 +30,7 @@ app.use('/api/auth', authRoutes)
 app.use('/api/users', userRoutes)
 app.use('/api/cart', cartRoutes)
 app.use('/api/orders', orderRoutes)
+app.use('/api/payments', paymentRoutes)
 
 app.listen(PORT, () => {
     console.log(`Server running in ${PORT}`)
