@@ -12,7 +12,6 @@ import { shippingCarriers } from '../data/shippingCarriers'
 import { calculateSubtotal } from '../utils/priceUtils'
 import type { PaymentMethodId } from '../types/paymentMethod'
 import { orderService } from '../services/orderService'
-
 import { useAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router'
 
@@ -47,7 +46,6 @@ const userAddress = {
 
 const CartScreen = () => {
     const { cartItems, clearCart } = useCart()
-
     const { isAuthenticated } = useAuth()
     const navigate = useNavigate()
 
@@ -59,8 +57,27 @@ const CartScreen = () => {
     const [installmentDelta, setInstallmentDelta] = useState(0)
     const [orderSuccess, setOrderSuccess] = useState<boolean | null>(null)
     const [orderNumber, setOrderNumber] = useState('')
+
     const rawStep = searchParams.get('step') as Step | null
     const step: Step = rawStep && VALID_STEPS.includes(rawStep) ? rawStep : 'cart'
+
+    // ── NUEVO: leemos el resultado de MP al volver del redirect ──
+    const mpResult = searchParams.get('mp') // 'success' | 'failure' | 'pending' | null
+
+    useEffect(() => {
+        if (!mpResult) return
+        if (mpResult === 'success' || mpResult === 'pending') {
+            setOrderSuccess(true)
+        } else {
+            setOrderSuccess(false)
+        }
+        // Limpiamos el query param mp de la URL sin cambiar el step
+        setSearchParams(prev => {
+            const next = new URLSearchParams(prev)
+            next.delete('mp')
+            return next
+        })
+    }, [mpResult])
 
     const setStep = (nextStep: Step) => {
         if (nextStep === 'cart') {
@@ -72,36 +89,23 @@ const CartScreen = () => {
 
     const isEmpty = cartItems.length === 0
 
-    // Guards — evitan que el usuario llegue a un step sin haber completado los anteriores
     useEffect(() => {
-        // Si el carrito está vacío no puede estar en ningún step avanzado (excepto confirmation)
-        // La excepción de orderSuccess !== null cubre el caso donde el carrito se vació
-        // justo después de confirmar la orden — sin esto, el guard redirige a 'cart' antes
-        // de que el step 'confirmation' se estabilice en el render
         if (isEmpty && step !== 'cart' && step !== 'confirmation' && orderSuccess === null) {
             setStep('cart')
             return
         }
-
-        // Si está en payment o más adelante pero no eligió envío, lo mandamos a shipping
         if (STEP_ORDER[step] >= STEP_ORDER['payment'] && shippingOption === null) {
             setStep('shipping')
             return
         }
-
-        // Si está en billing o más adelante pero no eligió método de pago, lo mandamos a payment
         if (STEP_ORDER[step] >= STEP_ORDER['billing'] && selectedPayment === null) {
             setStep('payment')
             return
         }
-
-        // Si está en credit_card pero el método elegido no es tarjeta, lo mandamos a payment
         if (step === 'credit_card' && selectedPayment !== 'credit_card') {
             setStep('payment')
             return
         }
-
-        // Si está en confirmation pero no hay resultado de orden, algo raro pasó
         if (step === 'confirmation' && orderSuccess === null) {
             setStep('cart')
             return
@@ -174,11 +178,25 @@ const CartScreen = () => {
                 subtotal,
                 total,
             })
-            setOrderNumber(order.orderNumber)
-            setOrderSuccess(true)
-            setStep('confirmation')
-            await clearCart()
-        } catch (error) {
+
+            if (selectedPayment === 'mercado_pago') {
+                try {
+                    const mpData = await orderService.createPreference(order.orderNumber)
+                    await clearCart()
+                    // Redirigimos en la misma pestaña para que el back_url funcione
+                    window.location.href = mpData.sandboxInitPoint
+                } catch {
+                    // Si falla crear la preferencia de MP, mostramos error
+                    setOrderSuccess(false)
+                    setStep('confirmation')
+                }
+            } else {
+                setOrderNumber(order.orderNumber)
+                setOrderSuccess(true)
+                setStep('confirmation')
+                await clearCart()
+            }
+        } catch {
             setOrderSuccess(false)
             setStep('confirmation')
         }
@@ -188,7 +206,6 @@ const CartScreen = () => {
 
     return (
         <div className="w-full max-w-7xl mx-auto py-12 px-4">
-            {/* Header con flecha y título */}
             <div className="flex items-center gap-4 mb-2">
                 {backTo ? (
                     <Link
@@ -237,13 +254,7 @@ const CartScreen = () => {
 
             <hr className="opacity-20 mb-8 border-black" />
 
-            {/* Carrito */}
-            {/* 
-                La condición incluye orderSuccess === null para evitar mostrar el carrito vacío
-                cuando el usuario acaba de confirmar una orden y el carrito todavía se está limpiando
-            */}
             {isEmpty && orderSuccess === null ? (
-                /* Carrito Vacío */
                 <div className="min-h-[50vh] flex items-center justify-center flex-col">
                     <svg
                         width="100px"
@@ -308,7 +319,6 @@ const CartScreen = () => {
                     </Link>
                 </div>
             ) : step === 'confirmation' ? (
-                /* Confirmación — pantalla completa, sin resumen lateral */
                 <OrderConfirmation
                     success={orderSuccess ?? false}
                     paymentMethod={selectedPayment!}
@@ -317,7 +327,6 @@ const CartScreen = () => {
                 />
             ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                    {/* LADO IZQUIERDO — cambia según el step */}
                     <div className="lg:col-span-8">
                         {step === 'cart' && <ProductList />}
                         {step === 'shipping' && (
@@ -329,6 +338,11 @@ const CartScreen = () => {
                             />
                         )}
                         {step === 'payment' && (
+                            // ── NUEVO: pasamos orderNumber a PaymentMethod ──
+                            // En el step payment la orden todavía no existe,
+                            // así que siempre es null aquí. Se usa en billing
+                            // si quisiéramos mostrar el botón de MP antes de confirmar,
+                            // pero el flujo actual crea la orden en handleConfirmOrder.
                             <PaymentMethod
                                 selected={selectedPayment}
                                 onSelect={setSelectedPayment}
@@ -360,7 +374,6 @@ const CartScreen = () => {
                         )}
                     </div>
 
-                    {/* RESUMEN — siempre visible excepto en billing (que tiene el suyo propio) */}
                     {step !== 'billing' && (
                         <OrderSummary
                             step={step}
