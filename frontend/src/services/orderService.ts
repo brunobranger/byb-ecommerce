@@ -39,4 +39,22 @@ export const orderService = {
         if (!res.ok) throw new Error('Error obteniendo órdenes')
         return res.json()
     },
+
+    // Agregá esto al objeto orderService existente:
+    createPreference: async (orderNumber: string) => {
+        const res = await fetch(`${API_URL}/payments/create-preference`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${getToken()}`,
+            },
+            body: JSON.stringify({ orderNumber }),
+        })
+        if (!res.ok) throw new Error('Error creando preferencia de pago')
+        return res.json() as Promise<{
+            preferenceId: string
+            initPoint: string
+            sandboxInitPoint: string
+        }>
+    },
 }

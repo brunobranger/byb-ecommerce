@@ -145,23 +145,18 @@ const CreditCardDetail = () => (
     </div>
 )
 
-const MercadoPagoDetail = () => (
-    <div className="flex flex-col items-center justify-center py-4 gap-4 text-center">
-        <div className="flex flex-col gap-1">
+const MercadoPagoDetail = () => {
+    // El usuario eligió MP pero la orden todavía no existe (paso payment antes de billing)
+    // El botón de confirmar en Billing es el que crea la orden y redirige
+    return (
+        <div className="flex flex-col items-center justify-center py-4 gap-2 text-center">
             <p className="font-semibold text-black">Serás redirigido a Mercado Pago</p>
             <p className="text-xs text-gray-400">
-                Completá el pago de forma segura en la plataforma de Mercado Pago.
+                Al confirmar tu pedido te redirigiremos a Mercado Pago para completar el pago de
+                forma segura.
             </p>
         </div>
-        <button
-            type="button"
-            disabled
-            className="bg-blue-500/20 text-blue-900/40 font-bold py-3 px-8 rounded-xl cursor-not-allowed text-sm uppercase tracking-widest"
-        >
-            Ir a Mercado Pago
-        </button>
-        <p className="text-xs text-gray-400">Integración disponible próximamente.</p>
-    </div>
-)
+    )
+}
 
 export default PaymentMethod
