@@ -1,5 +1,6 @@
 import { paymentMethods } from '../data/paymentMethods'
 import type { PaymentMethodId } from '../types/paymentMethod'
+import MercadoPagoDetail from './MercadoPagoDetail'
 
 // Datos bancarios hardcodeados por ahora
 const bankDetails = {
@@ -72,7 +73,13 @@ const PaymentMethod = ({ selected, onSelect }: PaymentMethodProps) => {
                         <div className="px-6 pb-6 border-t border-gray-100 pt-5">
                             {method.id === 'bank_deposit' && <BankDepositDetail />}
                             {method.id === 'credit_card' && <CreditCardDetail />}
-                            {method.id === 'mercado_pago' && <MercadoPagoDetail />}
+                            {method.id === 'mercado_pago' && (
+                                <MercadoPagoDetail
+                                    preferenceId={null}
+                                    loading={false}
+                                    error={null}
+                                />
+                            )}
                         </div>
                     )}
                 </div>
@@ -144,19 +151,5 @@ const CreditCardDetail = () => (
         <p className="font-semibold text-black">Próximamente</p>
     </div>
 )
-
-const MercadoPagoDetail = () => {
-    // El usuario eligió MP pero la orden todavía no existe (paso payment antes de billing)
-    // El botón de confirmar en Billing es el que crea la orden y redirige
-    return (
-        <div className="flex flex-col items-center justify-center py-4 gap-2 text-center">
-            <p className="font-semibold text-black">Serás redirigido a Mercado Pago</p>
-            <p className="text-xs text-gray-400">
-                Al confirmar tu pedido te redirigiremos a Mercado Pago para completar el pago de
-                forma segura.
-            </p>
-        </div>
-    )
-}
 
 export default PaymentMethod
