@@ -182,9 +182,10 @@ const CartScreen = () => {
             if (selectedPayment === 'mercado_pago') {
                 try {
                     const mpData = await orderService.createPreference(order.orderNumber)
+                    console.log('mpData:', mpData)
+                    console.log('sandboxInitPoint:', mpData.sandboxInitPoint)
                     await clearCart()
-                    // Redirigimos en la misma pestaña para que el back_url funcione
-                    window.location.href = mpData.sandboxInitPoint
+                    window.location.href = mpData.initPoint
                 } catch {
                     // Si falla crear la preferencia de MP, mostramos error
                     setOrderSuccess(false)
