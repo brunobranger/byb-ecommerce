@@ -12,6 +12,14 @@ console.log('Token completo:', process.env.MP_ACCESS_TOKEN)
 // POST /api/payments/create-preference
 export const createPreference = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
+        const { orderNumber } = req.body
+
+        const order = await Order.findOne({ orderNumber })
+        if (!order) {
+            res.status(404).json({ message: 'Orden no encontrada' })
+            return
+        }
+
         const response = await fetch('https://api.mercadopago.com/checkout/preferences', {
             method: 'POST',
             headers: {
@@ -19,14 +27,12 @@ export const createPreference = async (req: AuthRequest, res: Response): Promise
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                items: [
-                    {
-                        id: 'test',
-                        title: 'Producto de prueba',
-                        quantity: 1,
-                        unit_price: 100,
-                    },
-                ],
+                items: order.items.map(item => ({
+                    id: item.productId.toString(),
+                    title: item.name,
+                    quantity: item.quantity,
+                    unit_price: item.price,
+                })),
             }),
         })
 
