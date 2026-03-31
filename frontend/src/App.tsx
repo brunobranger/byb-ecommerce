@@ -10,6 +10,8 @@ import ProductDetailsPage from './pages/ProductDetailsPage'
 import UserProfile from './pages/UserProfile'
 import { useAuth } from './context/AuthContext'
 
+import AdminPanel from './pages/AdminPanel'
+
 // Componente para proteger la ruta /perfil
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     const { isAuthenticated, loading } = useAuth()
@@ -26,6 +28,7 @@ function App() {
                     <div className="min-h-screen bg-white">
                         <Navbar />
                         <Routes>
+                            <Route path="/admin" element={<AdminPanel />} />
                             <Route path="/" element={<Home />} />
                             <Route path="/categoria/:slug" element={<ProductsSection />} />
                             <Route
