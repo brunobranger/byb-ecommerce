@@ -8,6 +8,8 @@ const normalizeProduct = (p: Record<string, unknown>) => ({
     id: p['_id'] as string,
 })
 
+const getToken = () => localStorage.getItem('app_token')
+
 export const productService = {
     getAll: async (params?: {
         category?: string
@@ -32,5 +34,37 @@ export const productService = {
         if (!res.ok) throw new Error('Producto no encontrado')
         const data = await res.json()
         return normalizeProduct(data) as Product
+    },
+
+    createProduct: async (data: Record<string, unknown>): Promise<Product> => {
+        const res = await fetch(`${API_URL}/products`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${getToken()}`,
+            },
+            body: JSON.stringify(data),
+        })
+        if (!res.ok) {
+            const error = (await res.json()) as { message: string }
+            throw new Error(error.message)
+        }
+        return normalizeProduct(await res.json()) as Product
+    },
+
+    updateProduct: async (id: string, data: Record<string, unknown>): Promise<Product> => {
+        const res = await fetch(`${API_URL}/products/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${getToken()}`,
+            },
+            body: JSON.stringify(data),
+        })
+        if (!res.ok) {
+            const error = (await res.json()) as { message: string }
+            throw new Error(error.message)
+        }
+        return normalizeProduct(await res.json()) as Product
     },
 }
