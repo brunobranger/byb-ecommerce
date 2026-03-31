@@ -20,6 +20,14 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     return isAuthenticated ? children : <Navigate to="/ingresar" replace />
 }
 
+const AdminRoute = ({ children }: { children: React.ReactNode }) => {
+    const { isAuthenticated, loading, user } = useAuth()
+    if (loading) return null
+    if (!isAuthenticated) return <Navigate to="/ingresar" replace />
+    if (user?.role !== 'admin') return <Navigate to="/" replace />
+    return children
+}
+
 function App() {
     return (
         <AuthProvider>
@@ -28,7 +36,14 @@ function App() {
                     <div className="min-h-screen bg-white">
                         <Navbar />
                         <Routes>
-                            <Route path="/admin" element={<AdminPanel />} />
+                            <Route
+                                path="/admin"
+                                element={
+                                    <AdminRoute>
+                                        <AdminPanel />
+                                    </AdminRoute>
+                                }
+                            />
                             <Route path="/" element={<Home />} />
                             <Route path="/categoria/:slug" element={<ProductsSection />} />
                             <Route
