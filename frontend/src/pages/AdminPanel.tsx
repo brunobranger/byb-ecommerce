@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router'
 import { productService } from '../services/productService'
 import type { Product } from '../types/product'
 import { CATEGORY_DATA } from '../types/category'
+import SpecsForm from '../components/SpecsForm'
 
 const AdminPanel = () => {
     const { user, isAuthenticated, loading } = useAuth()
@@ -190,7 +191,7 @@ const ProductForm = ({ product, onSave }: { product: Product | null; onSave: () 
         subcategory: product?.subcategory ?? '',
         imageUrl: product?.imageUrl ?? '',
         images: product?.images?.join('\n') ?? '',
-        specs: product?.specs ? JSON.stringify(product.specs, null, 2) : '',
+        specs: product?.specs ?? ({} as Record<string, unknown>),
         isActive: product?.isActive ?? true,
     })
 
@@ -209,7 +210,7 @@ const ProductForm = ({ product, onSave }: { product: Product | null; onSave: () 
                 subcategory: form.subcategory || undefined,
                 imageUrl: form.imageUrl || undefined,
                 images: form.images ? form.images.split('\n').filter(Boolean) : [],
-                specs: form.specs ? JSON.parse(form.specs) : undefined,
+                specs: Object.keys(form.specs).length > 0 ? form.specs : undefined,
                 isActive: form.isActive,
             }
 
@@ -315,16 +316,16 @@ const ProductForm = ({ product, onSave }: { product: Product | null; onSave: () 
 
                 {/* Specs JSON */}
                 <div className="flex flex-col gap-1 sm:col-span-2">
-                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                        Specs <span className="normal-case font-normal">(JSON)</span>
-                    </label>
-                    <textarea
-                        value={form.specs}
-                        onChange={e => set('specs', e.target.value)}
-                        rows={8}
-                        placeholder='{"cores": 8, "threads": 16, ...}'
-                        className="border border-gray-300 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"
-                    />
+                    <div className="flex flex-col gap-3 sm:col-span-2">
+                        <p className="text-xs font-bold text-gray-400 uppercase tracking-widest border-b border-gray-200 pb-1">
+                            Especificaciones técnicas
+                        </p>
+                        <SpecsForm
+                            category={form.category}
+                            value={form.specs}
+                            onChange={specs => setForm(prev => ({ ...prev, specs }))}
+                        />
+                    </div>
                 </div>
 
                 {/* Activo */}
