@@ -35,7 +35,11 @@ export const userService = {
             },
             body: JSON.stringify(data),
         })
-        if (!res.ok) throw new Error('Error agregando dirección')
+        if (!res.ok) {
+            const errorBody = await res.json().catch(() => null)
+            console.error('addAddress error:', res.status, errorBody)
+            throw new Error(errorBody?.message ?? 'Error agregando dirección')
+        }
         return res.json()
     },
 

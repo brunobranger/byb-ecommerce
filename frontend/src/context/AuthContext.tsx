@@ -8,6 +8,7 @@ interface AuthContextType {
     login: (email: string, password: string) => Promise<void>
     register: (fullName: string, email: string, password: string) => Promise<void>
     logout: () => void
+    refreshUser: () => Promise<void>
     isAuthenticated: boolean
     loading: boolean
 }
@@ -70,9 +71,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setUser(null)
     }
 
+    const refreshUser = async () => {
+        const token = localStorage.getItem('app_token')
+        if (!token) return
+        const freshUser = await authService.me(token)
+        setUser(freshUser)
+    }
+
     return (
         <AuthContext.Provider
-            value={{ user, login, register, logout, isAuthenticated: !!user, loading }}
+            value={{ user, login, register, logout, refreshUser, isAuthenticated: !!user, loading }}
         >
             {children}
         </AuthContext.Provider>

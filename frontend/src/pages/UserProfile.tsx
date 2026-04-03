@@ -576,10 +576,10 @@ const MyAddresses = ({ user, onAddressChange }: MyAddressesProps) => {
 // ─── UserProfile ───
 
 const UserProfile = () => {
-    const { user, logout } = useAuth()
+    const { user, logout, refreshUser } = useAuth()
     const navigate = useNavigate()
     const [activeSection, setActiveSection] = useState<Section>('personal-info')
-    const [userRefresh, setUserRefresh] = useState(0)
+    const [userRefresh] = useState(0)
 
     const handleLogout = (): void => {
         logout()
@@ -628,10 +628,7 @@ const UserProfile = () => {
                     {activeSection === 'personal-info' && <PersonalInfo user={user} />}
                     {activeSection === 'order-history' && <OrderHistory />}
                     {activeSection === 'addresses' && (
-                        <MyAddresses
-                            user={user}
-                            onAddressChange={() => setUserRefresh(prev => prev + 1)}
-                        />
+                        <MyAddresses user={user} onAddressChange={refreshUser} />
                     )}
                 </main>
             </div>
