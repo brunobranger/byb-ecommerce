@@ -240,13 +240,15 @@ const ProductTable = ({
                         <td className="px-4 py-3 text-center">
                             <input
                                 type="number"
+                                readOnly
+                                disabled
                                 min={0}
                                 defaultValue={p.stock}
                                 onBlur={e => {
                                     const val = parseInt(e.target.value)
                                     if (!isNaN(val) && val !== p.stock) onStockChange(p, val)
                                 }}
-                                className="w-16 text-center border border-gray-300 rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-16 text-center border border-gray-300 rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                             />
                         </td>
                         <td className="px-4 py-3 text-center">
