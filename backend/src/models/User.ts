@@ -1,5 +1,19 @@
 import mongoose, { Schema, type Document } from 'mongoose'
 
+// Tipo del subdocumento con _id garantizado
+type IUserAddress = {
+    _id: mongoose.Types.ObjectId
+    label?: string
+    street: string
+    number: string
+    floor?: string
+    apartment?: string
+    city: string
+    zipCode: string
+    province: string
+    isDefault: boolean
+}
+
 export interface IUser extends Document {
     clientNumber: string
     fullName: string
@@ -13,7 +27,20 @@ export interface IUser extends Document {
     address: string
     postalCode: string
     role: 'user' | 'admin'
+    addresses: mongoose.Types.DocumentArray<mongoose.Types.Subdocument & IUserAddress>
 }
+
+const AddressSchema = new Schema<IUserAddress>({
+    label: { type: String, default: '' },
+    street: { type: String, required: true },
+    number: { type: String, required: true },
+    floor: { type: String, default: '' },
+    apartment: { type: String, default: '' },
+    city: { type: String, required: true },
+    zipCode: { type: String, required: true },
+    province: { type: String, required: true },
+    isDefault: { type: Boolean, default: false },
+})
 
 const UserSchema = new Schema<IUser>(
     {
@@ -29,9 +56,11 @@ const UserSchema = new Schema<IUser>(
         address: { type: String, default: '' },
         postalCode: { type: String, default: '' },
         role: { type: String, enum: ['user', 'admin'], default: 'user' },
+        addresses: { type: [AddressSchema], default: [] },
     },
     {
         versionKey: false,
+        timestamps: true,
     },
 )
 
