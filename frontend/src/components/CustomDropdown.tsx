@@ -1,35 +1,63 @@
 import { useState } from 'react'
 
-const CustomDropdown = () => {
-    const [isOpen, setIsOpen] = useState(false)
-    const [selected, setSelected] = useState('Destacados')
+interface CustomDropdownProps {
+    currentSort: string
+    onSortChange: (sort: string) => void
+}
 
-    const options = ['Destacados', 'Precio: Menor a Mayor', 'Precio: Mayor a Menor']
+const CustomDropdown = ({ currentSort, onSortChange }: CustomDropdownProps) => {
+    const [isOpen, setIsOpen] = useState(false)
+
+    const sortOptions = [
+        { value: 'relevance', label: 'Relevancia' },
+        { value: 'price_asc', label: 'Precio: Menor a Mayor' },
+        { value: 'price_desc', label: 'Precio: Mayor a Menor' },
+        { value: 'newest', label: 'Más Recientes' },
+    ]
+
+    const selectedOption = sortOptions.find(opt => opt.value === currentSort) || sortOptions[0]
+
+    const handleSelect = (value: string) => {
+        onSortChange(value)
+        setIsOpen(false)
+    }
 
     return (
-        <div className="relative inline-block text-left">
-            {/* Botón que activa el menú */}
+        <div className="relative w-64">
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="flex items-center justify-between w-64 px-4 py-2 bg-white border rounded-md shadow-sm"
+                className="w-full bg-white border border-gray-300 rounded-lg px-4 py-2.5 text-sm font-medium text-gray-900 hover:border-gray-400 transition-colors flex items-center justify-between"
             >
-                {selected}
-                <span className={`transition-transform ${isOpen ? 'rotate-180' : ''}`}>▼</span>
+                <span>{selectedOption.label}</span>
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2}
+                    stroke="currentColor"
+                    className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                >
+                    <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="m19.5 8.25-7.5 7.5-7.5-7.5"
+                    />
+                </svg>
             </button>
 
-            {/* Menú desplegable */}
             {isOpen && (
-                <div className="absolute right-0 z-10 w-64 mt-2 bg-white border rounded-md shadow-lg">
-                    {options.map(opt => (
+                <div className="absolute top-full mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg z-10">
+                    {sortOptions.map(option => (
                         <button
-                            key={opt}
-                            className="block w-full px-4 py-2 text-left hover:bg-gray-100 first:rounded-t-md last:rounded-b-md"
-                            onClick={() => {
-                                setSelected(opt)
-                                setIsOpen(false)
-                            }}
+                            key={option.value}
+                            onClick={() => handleSelect(option.value)}
+                            className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
+                                currentSort === option.value
+                                    ? 'bg-blue-50 text-blue-600 font-bold'
+                                    : 'text-gray-700 hover:bg-gray-50'
+                            }`}
                         >
-                            {opt}
+                            {option.label}
                         </button>
                     ))}
                 </div>

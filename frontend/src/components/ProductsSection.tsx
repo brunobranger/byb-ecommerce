@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react' // 👈 agregado useMemo
 import { useParams, useSearchParams } from 'react-router'
 import ProductCard from './ProductCard'
 import type { Product } from '../types/product'
@@ -10,7 +10,6 @@ import { productService } from '../services/productService'
 const formatSlug = (text: string) => text.toLowerCase().replace(/\s+/g, '-')
 
 // ─── Sidebar para /productos ────
-
 const CategorySidebar = () => {
     const [expanded, setExpanded] = useState<Set<string>>(new Set(CATEGORY_DATA.map(c => c.name)))
 
@@ -27,7 +26,6 @@ const CategorySidebar = () => {
             <li className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">
                 Todas las Categorías
             </li>
-
             {CATEGORY_DATA.map(category => {
                 const slug = formatSlug(category.name)
                 const isOpen = expanded.has(category.name)
@@ -65,7 +63,6 @@ const CategorySidebar = () => {
                                 </button>
                             )}
                         </div>
-
                         {hasItems && isOpen && (
                             <ul className="mb-1 border-l border-gray-200 ml-1 pl-3 space-y-0">
                                 {category.items.map(subItem => (
@@ -88,11 +85,11 @@ const CategorySidebar = () => {
 }
 
 // ─── Componente principal ────
-
 const ProductsSection = () => {
     const { categorySlug, subcategorySlug, slug } = useParams()
-    const [searchParams] = useSearchParams()
+    const [searchParams, setSearchParams] = useSearchParams()
     const searchQuery = searchParams.get('search') || ''
+    const sortBy = searchParams.get('sort') || 'relevance'
 
     const [products, setProducts] = useState<Product[]>([])
     const [loading, setLoading] = useState(true)
@@ -104,7 +101,6 @@ const ProductsSection = () => {
         ? currentCategory?.items.find(item => formatSlug(item) === subcategorySlug)
         : undefined
 
-    // Fetch al backend — se re-ejecuta cuando cambia categoría, subcategoría o búsqueda
     useEffect(() => {
         setLoading(true)
         productService
@@ -112,11 +108,38 @@ const ProductsSection = () => {
                 category: currentCategory?.name,
                 subcategory: currentSubcategory,
                 search: searchQuery || undefined,
+                sort: sortBy,
             })
             .then(setProducts)
             .catch(() => setProducts([]))
             .finally(() => setLoading(false))
-    }, [currentCategory?.name, currentSubcategory, searchQuery])
+    }, [currentCategory?.name, currentSubcategory, searchQuery, sortBy])
+
+    // 👇 Sorting en el frontend
+    const sortedProducts = useMemo(() => {
+        const sorted = [...products]
+        switch (sortBy) {
+            case 'price_asc':
+                return sorted.sort((a, b) => a.price - b.price)
+            case 'price_desc':
+                return sorted.sort((a, b) => b.price - a.price)
+            case 'newest':
+                return sorted.sort(
+                    (a, b) =>
+                        new Date(b.creationDate).getTime() - new Date(a.creationDate).getTime(),
+                )
+            default: // 'relevance' — respeta el orden del backend
+                return sorted
+        }
+    }, [products, sortBy])
+
+    const handleSort = (newSort: string) => {
+        setSearchParams(prev => {
+            const next = new URLSearchParams(prev)
+            next.set('sort', newSort)
+            return next
+        })
+    }
 
     const pageTitle = searchQuery
         ? `Resultados: ${searchQuery}`
@@ -156,23 +179,22 @@ const ProductsSection = () => {
                             )}
                             {searchQuery && (
                                 <p className="text-sm text-gray-400">
-                                    Mostrando {products.length} resultados
+                                    Mostrando {sortedProducts.length} resultados{' '}
+                                    {/* 👈 actualizado */}
                                 </p>
                             )}
                         </div>
                     </div>
                     <div>
-                        <CustomDropdown />
+                        <CustomDropdown currentSort={sortBy} onSortChange={handleSort} />
                     </div>
                 </div>
 
                 {/* Sidebar + Productos */}
                 <div className="flex flex-col md:flex-row gap-12">
-                    {/* Sidebar */}
                     <aside className="w-full md:w-64 shrink-0">
                         <ul className="space-y-2">
                             {activeSlug && currentCategory ? (
-                                // MODO CATEGORÍA — sin cambios
                                 <>
                                     <li className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">
                                         Filtros de {currentCategory.name}
@@ -192,7 +214,6 @@ const ProductsSection = () => {
                                     {currentCategory.items.map(subItem => {
                                         const subItemSlug = formatSlug(subItem)
                                         const isActive = subItemSlug === subcategorySlug
-
                                         return (
                                             <li key={subItem}>
                                                 <Link
@@ -210,7 +231,6 @@ const ProductsSection = () => {
                                     })}
                                 </>
                             ) : (
-                                // MODO GENERAL — acordeón con subcategorías
                                 <li className="list-none">
                                     <CategorySidebar />
                                 </li>
@@ -224,11 +244,15 @@ const ProductsSection = () => {
                             <div className="py-20 text-center">
                                 <p className="text-gray-400 font-medium">Cargando productos...</p>
                             </div>
-                        ) : products.length > 0 ? (
+                        ) : sortedProducts.length > 0 ? ( // 👈 actualizado
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                                {products.map((product: Product) => (
-                                    <ProductCard key={product.id} product={product} />
-                                ))}
+                                {sortedProducts.map(
+                                    (
+                                        product: Product, // 👈 actualizado
+                                    ) => (
+                                        <ProductCard key={product.id} product={product} />
+                                    ),
+                                )}
                             </div>
                         ) : (
                             <div className="py-20 text-center border-2 border-dashed border-gray-200 rounded-xl">
