@@ -15,6 +15,10 @@ const AdminPanel = () => {
     const [view, setView] = useState<'list' | 'create' | 'edit'>('list')
     const [selected, setSelected] = useState<Product | null>(null)
 
+    // Filtros
+    const [searchTerm, setSearchTerm] = useState('')
+    const [selectedCategory, setSelectedCategory] = useState<string>('')
+
     useEffect(() => {
         if (!loading && (!isAuthenticated || user?.role !== 'admin')) {
             navigate('/')
@@ -27,6 +31,13 @@ const AdminPanel = () => {
             .then(setProducts)
             .finally(() => setFetching(false))
     }, [])
+
+    // Filtrar productos
+    const filteredProducts = products.filter(p => {
+        const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase())
+        const matchesCategory = selectedCategory === '' || p.category === selectedCategory
+        return matchesSearch && matchesCategory
+    })
 
     if (loading || fetching)
         return (
@@ -60,23 +71,112 @@ const AdminPanel = () => {
             </div>
 
             {view === 'list' && (
-                <ProductTable
-                    products={products}
-                    onEdit={p => {
-                        setSelected(p)
-                        setView('edit')
-                    }}
-                    onToggle={async p => {
-                        await productService.updateProduct(p.id, { isActive: !p.isActive })
-                        setProducts(prev =>
-                            prev.map(x => (x.id === p.id ? { ...x, isActive: !x.isActive } : x)),
-                        )
-                    }}
-                    onStockChange={async (p, stock) => {
-                        await productService.updateProduct(p.id, { stock })
-                        setProducts(prev => prev.map(x => (x.id === p.id ? { ...x, stock } : x)))
-                    }}
-                />
+                <>
+                    {/* Buscador y filtros */}
+                    <div className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm mb-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            {/* Buscador */}
+                            <div className="flex flex-col gap-1">
+                                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                    Buscar producto
+                                </label>
+                                <div className="flex items-center gap-2">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        strokeWidth={2}
+                                        stroke="currentColor"
+                                        className="w-4 h-4 text-gray-400"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.5 5.5a7.5 7.5 0 0 0 10.5 10.5Z"
+                                        />
+                                    </svg>
+                                    <input
+                                        type="text"
+                                        placeholder="Ej: Procesador, Monitor..."
+                                        value={searchTerm}
+                                        onChange={e => setSearchTerm(e.target.value)}
+                                        className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    />
+                                    {searchTerm && (
+                                        <button
+                                            onClick={() => setSearchTerm('')}
+                                            className="text-gray-400 hover:text-gray-600 transition-colors"
+                                        >
+                                            ✕
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Filtro por categoría */}
+                            <div className="flex flex-col gap-1">
+                                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                    Categoría
+                                </label>
+                                <select
+                                    value={selectedCategory}
+                                    onChange={e => setSelectedCategory(e.target.value)}
+                                    className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                >
+                                    <option value="">Todas las categorías</option>
+                                    {CATEGORY_DATA.map(c => (
+                                        <option key={c.name} value={c.name}>
+                                            {c.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+
+                        {/* Mostrar resultado del filtrado */}
+                        <p className="text-xs text-gray-500 mt-3">
+                            Mostrando{' '}
+                            <span className="font-bold text-gray-700">
+                                {filteredProducts.length}
+                            </span>{' '}
+                            de <span className="font-bold text-gray-700">{products.length}</span>{' '}
+                            productos
+                        </p>
+                    </div>
+
+                    {/* Tabla */}
+                    {filteredProducts.length > 0 ? (
+                        <ProductTable
+                            products={filteredProducts}
+                            onEdit={p => {
+                                setSelected(p)
+                                setView('edit')
+                            }}
+                            onToggle={async p => {
+                                await productService.updateProduct(p.id, {
+                                    isActive: !p.isActive,
+                                })
+                                setProducts(prev =>
+                                    prev.map(x =>
+                                        x.id === p.id ? { ...x, isActive: !x.isActive } : x,
+                                    ),
+                                )
+                            }}
+                            onStockChange={async (p, stock) => {
+                                await productService.updateProduct(p.id, { stock })
+                                setProducts(prev =>
+                                    prev.map(x => (x.id === p.id ? { ...x, stock } : x)),
+                                )
+                            }}
+                        />
+                    ) : (
+                        <div className="bg-white border border-gray-200 rounded-2xl p-12 shadow-sm text-center">
+                            <p className="text-gray-500 text-sm">
+                                No se encontraron productos con esos criterios.
+                            </p>
+                        </div>
+                    )}
+                </>
             )}
 
             {(view === 'create' || view === 'edit') && (
